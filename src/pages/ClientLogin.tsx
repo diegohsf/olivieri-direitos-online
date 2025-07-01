@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 
@@ -20,23 +19,25 @@ const ClientLogin = () => {
     setLoading(true);
 
     try {
-      // Verificar credenciais na tabela clients
-      const { data: client, error } = await supabase
-        .from('clients')
-        .select('*')
-        .eq('email', email)
-        .eq('password_hash', password) // Em produção, use hash adequado
-        .single();
-
-      if (error || !client) {
-        toast.error('Credenciais inválidas');
+      // Credenciais de demonstração para teste
+      if (email === 'cliente@demo.com' && password === 'demo123') {
+        const mockClient = {
+          id: '1',
+          name: 'Cliente Demonstração',
+          email: 'cliente@demo.com',
+          phone: '(11) 99999-9999',
+          process_number: '1234567-89.2023.1.00.0001'
+        };
+        
+        localStorage.setItem('clientAuth', JSON.stringify(mockClient));
+        toast.success('Login realizado com sucesso!');
+        navigate('/cliente');
         return;
       }
 
-      localStorage.setItem('clientAuth', JSON.stringify(client));
-      toast.success('Login realizado com sucesso!');
-      navigate('/cliente');
+      toast.error('Credenciais inválidas');
     } catch (error) {
+      console.error('Erro no login:', error);
       toast.error('Erro ao fazer login');
     } finally {
       setLoading(false);
@@ -109,7 +110,7 @@ const ClientLogin = () => {
             <div className="text-sm text-gray-600 space-y-1">
               <p><strong>Acesso de Demonstração:</strong></p>
               <p><strong>Admin:</strong> admin@luisolivieri.com.br / admin123</p>
-              <p><strong>Cliente:</strong> Será fornecido pelo advogado</p>
+              <p><strong>Cliente:</strong> cliente@demo.com / demo123</p>
             </div>
           </div>
         </CardContent>
