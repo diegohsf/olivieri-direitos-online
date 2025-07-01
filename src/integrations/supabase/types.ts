@@ -126,6 +126,39 @@ export type Database = {
         }
         Relationships: []
       }
+      clients: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          password_hash: string
+          phone: string
+          process_number: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          password_hash: string
+          phone: string
+          process_number: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          password_hash?: string
+          phone?: string
+          process_number?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       connected_warming_users: {
         Row: {
           connected_at: string
@@ -599,6 +632,44 @@ export type Database = {
         }
         Relationships: []
       }
+      process_data: {
+        Row: {
+          case_data: Json | null
+          client_id: string | null
+          created_at: string
+          id: string
+          last_updated: string
+          movements: Json | null
+          process_number: string
+        }
+        Insert: {
+          case_data?: Json | null
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          last_updated?: string
+          movements?: Json | null
+          process_number: string
+        }
+        Update: {
+          case_data?: Json | null
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          last_updated?: string
+          movements?: Json | null
+          process_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "process_data_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       process_payments: {
         Row: {
           amount: number
@@ -634,6 +705,41 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      process_update_requests: {
+        Row: {
+          client_id: string | null
+          completed_at: string | null
+          id: string
+          process_number: string
+          requested_at: string
+          status: string
+        }
+        Insert: {
+          client_id?: string | null
+          completed_at?: string | null
+          id?: string
+          process_number: string
+          requested_at?: string
+          status?: string
+        }
+        Update: {
+          client_id?: string | null
+          completed_at?: string | null
+          id?: string
+          process_number?: string
+          requested_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "process_update_requests_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {

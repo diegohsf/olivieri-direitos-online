@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -117,25 +116,30 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-slate-800 text-white py-4 sticky top-0 z-50">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <img src="/lovable-uploads/cdd2862a-e90c-4d36-b585-2687f9cfcee1.png" alt="Luis Olivieri Logo" className="h-12 w-auto" />
-            <div>
-              <span className="text-xl font-bold">Luis Augusto Olivieri</span>
-              <p className="text-sm text-amber-400">Sociedade de Advogados</p>
+      <header className="bg-[#1a237e] text-white shadow-lg sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <img 
+                src="/lovable-uploads/cdd2862a-e90c-4d36-b585-2687f9cfcee1.png" 
+                alt="Logo" 
+                className="h-12 w-auto"
+              />
+              <div>
+                <h1 className="text-2xl font-bold">Luis Augusto Olivieri</h1>
+                <p className="text-sm text-[#ffd700]">OAB/SP 252.648</p>
+              </div>
             </div>
+            <nav className="hidden md:flex space-x-8">
+              <a href="/" className="hover:text-[#ffd700] transition-colors">Início</a>
+              <a href="/sobre" className="hover:text-[#ffd700] transition-colors">Sobre</a>
+              <a href="/especialidades" className="hover:text-[#ffd700] transition-colors">Especialidades</a>
+              <a href="/depoimentos" className="hover:text-[#ffd700] transition-colors">Depoimentos</a>
+              <a href="/contato" className="hover:text-[#ffd700] transition-colors">Contato</a>
+              <a href="/admin-login" className="hover:text-[#ffd700] transition-colors">Admin</a>
+              <a href="/cliente-login" className="hover:text-[#ffd700] transition-colors">Área do Cliente</a>
+            </nav>
           </div>
-          <nav className="hidden md:flex space-x-6">
-            <a href="#inicio" className="hover:text-amber-400 transition-colors">Início</a>
-            <a href="#sobre" className="hover:text-amber-400 transition-colors">Sobre</a>
-            <a href="#especialidades" className="hover:text-amber-400 transition-colors">Especialidades</a>
-            <a href="#depoimentos" className="hover:text-amber-400 transition-colors">Depoimentos</a>
-            <a href="#contato" className="hover:text-amber-400 transition-colors">Contato</a>
-            <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-slate-800 font-medium">
-              Área do Cliente
-            </Button>
-          </nav>
         </div>
       </header>
 
@@ -508,11 +512,11 @@ const Index = () => {
             <div>
               <h4 className="font-semibold mb-4">Links Rápidos</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#inicio" className="hover:text-white">Início</a></li>
-                <li><a href="#sobre" className="hover:text-white">Sobre</a></li>
-                <li><a href="#especialidades" className="hover:text-white">Especialidades</a></li>
-                <li><a href="#depoimentos" className="hover:text-white">Depoimentos</a></li>
-                <li><a href="#contato" className="hover:text-white">Contato</a></li>
+                <li><a href="/" className="hover:text-white">Início</a></li>
+                <li><a href="/sobre" className="hover:text-white">Sobre</a></li>
+                <li><a href="/especialidades" className="hover:text-white">Especialidades</a></li>
+                <li><a href="/depoimentos" className="hover:text-white">Depoimentos</a></li>
+                <li><a href="/contato" className="hover:text-white">Contato</a></li>
               </ul>
             </div>
             
