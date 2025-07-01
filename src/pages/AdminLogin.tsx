@@ -16,8 +16,8 @@ const AdminLogin = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulação de login admin - em produção, use autenticação real
-    if (email === 'admin@luisolivieri.com' && password === 'admin123') {
+    // Credenciais do admin
+    if (email === 'admin@luisolivieri.com.br' && password === 'admin123') {
       localStorage.setItem('adminAuth', 'true');
       toast.success('Login realizado com sucesso!');
       navigate('/admin');
@@ -67,6 +67,12 @@ const AdminLogin = () => {
               {loading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
+          
+          <div className="mt-4 p-3 bg-gray-50 rounded text-sm text-gray-600">
+            <p><strong>Credenciais de acesso:</strong></p>
+            <p>Email: admin@luisolivieri.com.br</p>
+            <p>Senha: admin123</p>
+          </div>
         </CardContent>
       </Card>
     </div>

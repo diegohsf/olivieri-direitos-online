@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -115,8 +116,33 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Top Bar */}
+      <div className="bg-[#1a237e] text-white py-2">
+        <div className="container mx-auto px-4 flex items-center justify-between text-sm">
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-2">
+              <Phone className="w-4 h-4" />
+              <span>(11) 3380-6725</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Phone className="w-4 h-4" />
+              <span>(11) 94792-8925</span>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <span>Atuamos em todo Território Nacional de Forma 100% Digital</span>
+            <Button 
+              size="sm" 
+              className="bg-[#ffd700] text-[#1a237e] hover:bg-[#ffed4e] font-medium"
+            >
+              <a href="/cliente-login">🔐 Área do Cliente</a>
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {/* Header */}
-      <header className="bg-[#1a237e] text-white shadow-lg sticky top-0 z-50">
+      <header className="bg-white text-[#1a237e] shadow-lg sticky top-0 z-50 border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -126,18 +152,22 @@ const Index = () => {
                 className="h-12 w-auto"
               />
               <div>
-                <h1 className="text-2xl font-bold">Luis Augusto Olivieri</h1>
-                <p className="text-sm text-[#ffd700]">OAB/SP 252.648</p>
+                <h1 className="text-2xl font-bold text-[#1a237e]">Luis Augusto Olivieri</h1>
+                <p className="text-sm text-gray-600">Sociedade de Advogados</p>
               </div>
             </div>
-            <nav className="hidden md:flex space-x-8">
-              <a href="/" className="hover:text-[#ffd700] transition-colors">Início</a>
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="/" className="hover:text-[#ffd700] transition-colors font-medium border-b-2 border-[#1a237e]">Início</a>
               <a href="/sobre" className="hover:text-[#ffd700] transition-colors">Sobre</a>
               <a href="/especialidades" className="hover:text-[#ffd700] transition-colors">Especialidades</a>
               <a href="/depoimentos" className="hover:text-[#ffd700] transition-colors">Depoimentos</a>
               <a href="/contato" className="hover:text-[#ffd700] transition-colors">Contato</a>
-              <a href="/admin-login" className="hover:text-[#ffd700] transition-colors">Admin</a>
-              <a href="/cliente-login" className="hover:text-[#ffd700] transition-colors">Área do Cliente</a>
+              <Button 
+                size="sm" 
+                className="bg-[#1a237e] text-white hover:bg-[#283593] font-medium"
+              >
+                <a href="/cliente-login">👤 Área do Cliente</a>
+              </Button>
             </nav>
           </div>
         </div>

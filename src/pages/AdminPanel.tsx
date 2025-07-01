@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LogOut, Plus, Trash2 } from "lucide-react";
+import { LogOut, Plus, Trash2, Users, Eye, UserPlus, Search, Edit } from "lucide-react";
 
 interface Client {
   id: string;
@@ -28,6 +28,7 @@ const AdminPanel = () => {
     password: '',
     process_number: ''
   });
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -107,37 +108,113 @@ const AdminPanel = () => {
     navigate('/admin-login');
   };
 
+  const filteredClients = clients.filter(client =>
+    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.process_number.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalClients = clients.length;
+  const newThisMonth = clients.filter(client => {
+    const created = new Date(client.created_at);
+    const now = new Date();
+    return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
+  }).length;
+
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-[#1a237e]">Painel Administrativo</h1>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setShowAddForm(!showAddForm)}
-              className="bg-[#ffd700] text-[#1a237e] hover:bg-[#ffed4e]"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Novo Cliente
-            </Button>
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              className="border-[#1a237e] text-[#1a237e]"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Sair
-            </Button>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b px-6 py-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-800">Painel Administrativo</h1>
+            <p className="text-gray-600">Bem-vindo, Dr. Luis Augusto Olivieri</p>
           </div>
+          <Button
+            onClick={handleLogout}
+            variant="outline"
+            className="border-gray-300 text-gray-600 hover:bg-gray-50"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sair
+          </Button>
+        </div>
+      </div>
+
+      <div className="p-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="bg-white">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <Users className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Total de Clientes</p>
+                  <p className="text-2xl font-bold text-gray-800">{totalClients}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <Eye className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Acessos Hoje</p>
+                  <p className="text-2xl font-bold text-gray-800">0</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-yellow-100 rounded-lg">
+                  <UserPlus className="w-6 h-6 text-yellow-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Novos Este Mês</p>
+                  <p className="text-2xl font-bold text-gray-800">{newThisMonth}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
+        {/* Search and Add Button */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="relative w-96">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Buscar clientes..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="bg-[#1a237e] text-white hover:bg-[#283593]"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Adicionar Cliente
+          </Button>
+        </div>
+
+        {/* Add Client Form */}
         {showAddForm && (
-          <Card className="mb-6">
+          <Card className="mb-6 bg-white">
             <CardHeader>
-              <CardTitle>Adicionar Novo Cliente</CardTitle>
+              <CardTitle className="text-lg">Adicionar Novo Cliente</CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleAddClient} className="grid grid-cols-2 gap-4">
+              <form onSubmit={handleAddClient} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   placeholder="Nome completo"
                   value={formData.name}
@@ -169,9 +246,9 @@ const AdminPanel = () => {
                   value={formData.process_number}
                   onChange={(e) => setFormData({ ...formData, process_number: e.target.value })}
                   required
-                  className="col-span-2"
+                  className="md:col-span-2"
                 />
-                <div className="col-span-2 flex gap-2">
+                <div className="md:col-span-2 flex gap-2">
                   <Button
                     type="submit"
                     className="bg-[#1a237e] text-white hover:bg-[#283593]"
@@ -192,41 +269,64 @@ const AdminPanel = () => {
           </Card>
         )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Clientes Cadastrados</CardTitle>
-          </CardHeader>
-          <CardContent>
+        {/* Clients Table */}
+        <Card className="bg-white">
+          <CardContent className="p-0">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Telefone</TableHead>
-                  <TableHead>Processo</TableHead>
-                  <TableHead>Data Cadastro</TableHead>
-                  <TableHead>Ações</TableHead>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="font-semibold">CLIENTE</TableHead>
+                  <TableHead className="font-semibold">CONTATO</TableHead>
+                  <TableHead className="font-semibold">PROCESSO</TableHead>
+                  <TableHead className="font-semibold">SENHA</TableHead>
+                  <TableHead className="font-semibold">ÚLTIMO ACESSO</TableHead>
+                  <TableHead className="font-semibold">AÇÕES</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {clients.map((client) => (
-                  <TableRow key={client.id}>
-                    <TableCell>{client.name}</TableCell>
-                    <TableCell>{client.email}</TableCell>
-                    <TableCell>{client.phone}</TableCell>
-                    <TableCell>{client.process_number}</TableCell>
+                {filteredClients.map((client) => (
+                  <TableRow key={client.id} className="hover:bg-gray-50">
                     <TableCell>
-                      {new Date(client.created_at).toLocaleDateString('pt-BR')}
+                      <div>
+                        <p className="font-medium text-gray-900">{client.name}</p>
+                        <p className="text-sm text-gray-500">ID: {client.id.slice(0, 8)}...</p>
+                      </div>
                     </TableCell>
                     <TableCell>
-                      <Button
-                        onClick={() => handleDeleteClient(client.id)}
-                        variant="outline"
-                        size="sm"
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div>
+                        <p className="text-sm">{client.email}</p>
+                        <p className="text-sm text-gray-500">{client.phone}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                        {client.process_number}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-gray-600">f2pfumal</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-gray-500">Nunca</span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteClient(client.id)}
+                          size="sm"
+                          variant="outline"
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
