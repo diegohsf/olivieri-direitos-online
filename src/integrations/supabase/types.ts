@@ -126,44 +126,6 @@ export type Database = {
         }
         Relationships: []
       }
-      chat_messages: {
-        Row: {
-          conversation_id: string
-          created_at: string
-          id: string
-          message_text: string
-          read_at: string | null
-          sender_id: string
-          sender_type: string
-        }
-        Insert: {
-          conversation_id: string
-          created_at?: string
-          id?: string
-          message_text: string
-          read_at?: string | null
-          sender_id: string
-          sender_type: string
-        }
-        Update: {
-          conversation_id?: string
-          created_at?: string
-          id?: string
-          message_text?: string
-          read_at?: string | null
-          sender_id?: string
-          sender_type?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "chat_messages_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "conversations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       client_documents: {
         Row: {
           client_id: string
@@ -343,38 +305,6 @@ export type Database = {
           total_contacts?: number
         }
         Relationships: []
-      }
-      conversations: {
-        Row: {
-          client_id: string
-          created_at: string
-          id: string
-          last_message_at: string | null
-          updated_at: string
-        }
-        Insert: {
-          client_id: string
-          created_at?: string
-          id?: string
-          last_message_at?: string | null
-          updated_at?: string
-        }
-        Update: {
-          client_id?: string
-          created_at?: string
-          id?: string
-          last_message_at?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "conversations_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       developers: {
         Row: {

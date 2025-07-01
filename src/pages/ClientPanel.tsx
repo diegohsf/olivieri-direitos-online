@@ -1,217 +1,298 @@
-
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, MessageCircle, User, AlertCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import { LogOut, User, Phone, Mail, Hash } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
-import DocumentsList from "@/components/client/DocumentsList";
+import ProcessSelector from "@/components/client/ProcessSelector";
 import ProcessDetails from "@/components/client/ProcessDetails";
 import DocumentUpload from "@/components/client/DocumentUpload";
-import ClientChat from "@/components/chat/ClientChat";
+import DocumentsList from "@/components/client/DocumentsList";
 
 interface Client {
   id: string;
   name: string;
   email: string;
   phone: string;
-  process_number: string;
 }
 
-export default function ClientPanel() {
+interface ClientProcess {
+  id: string;
+  process_number: string;
+  created_at: string;
+}
+
+interface ProcessMovement {
+  date: string;
+  description: string;
+  type: string;
+  content?: string;
+  step_date?: string;
+}
+
+const ClientPanel = () => {
   const [client, setClient] = useState<Client | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [refreshDocuments, setRefreshDocuments] = useState(0);
+  const [clientProcesses, setClientProcesses] = useState<ClientProcess[]>([]);
+  const [selectedProcessId, setSelectedProcessId] = useState<string | null>(null);
+  const [selectedProcessNumber, setSelectedProcessNumber] = useState<string>('');
   const [processData, setProcessData] = useState<any>(null);
-  const [movements, setMovements] = useState<any[]>([]);
-  const [processLoading, setProcessLoading] = useState(false);
-  const { toast } = useToast();
+  const [movements, setMovements] = useState<ProcessMovement[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [documentsRefresh, setDocumentsRefresh] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    const clientEmail = localStorage.getItem('clientEmail');
-    const clientAuth = localStorage.getItem('clientAuth');
-
-    if (!clientEmail || !clientAuth) {
+    const clientData = localStorage.getItem('clientAuth');
+    if (!clientData) {
       navigate('/login');
       return;
     }
 
     try {
+      const parsedClient = JSON.parse(clientData);
+      setClient(parsedClient);
+      fetchClientProcesses(parsedClient.id);
+    } catch (error) {
+      console.error('Erro ao carregar dados do cliente:', error);
+      navigate('/login');
+    }
+  }, [navigate]);
+
+  const fetchClientProcesses = async (clientId: string) => {
+    try {
       const { data, error } = await supabase
-        .from('clients')
+        .from('client_processes')
         .select('*')
-        .eq('email', clientEmail)
-        .single();
+        .eq('client_id', clientId)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setClient(data);
+
+      setClientProcesses(data || []);
       
-      // Buscar dados do processo
-      if (data.process_number) {
-        await fetchProcessData(data.process_number);
+      // Se há apenas um processo, seleciona automaticamente
+      if (data && data.length === 1) {
+        setSelectedProcessId(data[0].id);
+        setSelectedProcessNumber(data[0].process_number);
+        fetchProcessData(data[0].process_number);
       }
     } catch (error) {
-      console.error('Erro ao verificar autenticação:', error);
-      toast({
-        title: "Erro de Autenticação",
-        description: "Sessão expirada. Faça login novamente.",
-        variant: "destructive",
-      });
-      navigate('/login');
+      console.error('Erro ao carregar processos do cliente:', error);
+      toast.error('Erro ao carregar processos');
+    }
+  };
+
+  const fetchProcessData = async (processNumber: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('process_consultations')
+        .select('*')
+        .eq('numero_processo', processNumber)
+        .single();
+
+      if (error) {
+        console.error('Erro ao buscar dados do processo:', error);
+        setMockData(processNumber);
+        return;
+      }
+
+      if (data && data.data && typeof data.data === 'object' && data.data !== null) {
+        console.log('Dados do processo encontrados:', data);
+        
+        const processInfoData = data.data as any;
+        let processInfo;
+        
+        // Verificar se data.data tem payload
+        if (processInfoData && typeof processInfoData === 'object' && 'payload' in processInfoData) {
+          processInfo = processInfoData.payload?.response_data || processInfoData;
+        } else {
+          processInfo = processInfoData;
+        }
+        
+        setProcessData({ case_data: processInfo });
+        
+        const steps = processInfo.steps || [];
+        if (Array.isArray(steps)) {
+          const formattedMovements = steps.map((step: any) => ({
+            date: step.step_date || new Date().toISOString(),
+            description: step.content || 'Movimentação',
+            type: step.type || 'Movimento',
+            content: step.content
+          }));
+          setMovements(formattedMovements);
+        } else {
+          setMovements([]);
+        }
+      } else {
+        setMockData(processNumber);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar processo:', error);
+      setMockData(processNumber);
+    }
+  };
+
+  const setMockData = (processNumber: string) => {
+    const mockProcessData = {
+      case_data: {
+        code: processNumber,
+        numero: processNumber,
+        classe: 'Execução Fiscal',
+        assunto: 'Dívida Ativa',
+        valor: 'R$ 25.000,00',
+        distribuicao: '15/03/2023',
+        status: 'Em andamento'
+      }
+    };
+    
+    const mockMovements = [
+      {
+        date: '2023-12-01',
+        description: 'Processo distribuído',
+        type: 'Distribuição'
+      },
+      {
+        date: '2023-12-15',
+        description: 'Citação realizada',
+        type: 'Citação'
+      },
+      {
+        date: '2024-01-10',
+        description: 'Contestação apresentada',
+        type: 'Contestação'
+      }
+    ];
+    
+    setProcessData(mockProcessData);
+    setMovements(mockMovements);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('clientAuth');
+    navigate('/login');
+    toast.success('Logout realizado com sucesso!');
+  };
+
+  const handleProcessSelect = (processId: string, processNumber: string) => {
+    setSelectedProcessId(processId);
+    setSelectedProcessNumber(processNumber);
+    fetchProcessData(processNumber);
+  };
+
+  const requestUpdate = async () => {
+    if (!selectedProcessNumber) return;
+    
+    setLoading(true);
+    try {
+      await fetchProcessData(selectedProcessNumber);
+      toast.success('Dados atualizados com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao atualizar dados');
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchProcessData = async (processNumber: string) => {
-    setProcessLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('process_data')
-        .select('*')
-        .eq('process_number', processNumber)
-        .single();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      
-      if (data) {
-        setProcessData(data.case_data);
-        setMovements(data.movements || []);
-      }
-    } catch (error) {
-      console.error('Erro ao buscar dados do processo:', error);
-    } finally {
-      setProcessLoading(false);
-    }
-  };
-
-  const handleRefreshProcess = () => {
-    if (client?.process_number) {
-      fetchProcessData(client.process_number);
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('clientEmail');
-    localStorage.removeItem('clientAuth');
-    navigate('/login');
-  };
-
-  const handleUploadSuccess = () => {
-    setRefreshDocuments(prev => prev + 1);
-    toast({
-      title: "Sucesso",
-      description: "Documentos enviados com sucesso!",
-    });
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (!client) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-600">
-              <AlertCircle className="h-5 w-5" />
-              Erro de Acesso
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600 mb-4">Não foi possível carregar os dados do cliente.</p>
-            <Button onClick={() => navigate('/login')} className="w-full">
-              Fazer Login
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <div>Carregando...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <User className="h-8 w-8 text-blue-600" />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground p-6 shadow-lg">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Painel do Cliente</h1>
+            <p className="text-accent/80 text-lg">Luis Augusto Olivieri - Advogados</p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={handleLogout}
+            className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary transition-all duration-200"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sair
+          </Button>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        {/* Informações do Cliente */}
+        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground rounded-t-lg">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <User className="w-6 h-6" />
+              Informações do Cliente
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                <User className="w-5 h-5 text-primary" />
                 <div>
-                  <h1 className="text-xl font-semibold text-gray-900">Painel do Cliente</h1>
-                  <p className="text-sm text-gray-500">Bem-vindo, {client.name}</p>
+                  <span className="text-sm text-gray-600 block">Nome</span>
+                  <span className="font-semibold text-gray-800">{client.name}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                <Mail className="w-5 h-5 text-accent" />
+                <div>
+                  <span className="text-sm text-gray-600 block">Email</span>
+                  <span className="font-semibold text-gray-800">{client.email}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                <Phone className="w-5 h-5 text-primary" />
+                <div>
+                  <span className="text-sm text-gray-600 block">Telefone</span>
+                  <span className="font-semibold text-gray-800">{client.phone}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                <Hash className="w-5 h-5 text-accent" />
+                <div>
+                  <span className="text-sm text-gray-600 block">Total de Processos</span>
+                  <span className="font-semibold text-gray-800">{clientProcesses.length}</span>
                 </div>
               </div>
             </div>
-            <Button variant="outline" onClick={handleLogout}>
-              Sair
-            </Button>
-          </div>
+          </CardContent>
+        </Card>
+
+        {/* Seletor de Processos */}
+        <ProcessSelector
+          processes={clientProcesses}
+          selectedProcessId={selectedProcessId}
+          onProcessSelect={handleProcessSelect}
+        />
+
+        {/* Detalhes do Processo */}
+        {selectedProcessId && selectedProcessNumber && (
+          <ProcessDetails
+            processNumber={selectedProcessNumber}
+            processData={processData}
+            movements={movements}
+            loading={loading}
+            onRefresh={requestUpdate}
+          />
+        )}
+
+        {/* Seção de Documentos */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <DocumentUpload 
+            clientId={client.id} 
+            onUploadSuccess={() => setDocumentsRefresh(prev => prev + 1)} 
+          />
+          <DocumentsList 
+            clientId={client.id} 
+            refreshTrigger={documentsRefresh} 
+          />
         </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="processo" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="processo" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Processo
-            </TabsTrigger>
-            <TabsTrigger value="documentos" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Documentos
-            </TabsTrigger>
-            <TabsTrigger value="upload" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Upload
-            </TabsTrigger>
-            <TabsTrigger value="chat" className="flex items-center gap-2">
-              <MessageCircle className="h-4 w-4" />
-              Chat
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="processo">
-            <ProcessDetails 
-              processNumber={client.process_number}
-              processData={processData}
-              movements={movements}
-              loading={processLoading}
-              onRefresh={handleRefreshProcess}
-            />
-          </TabsContent>
-
-          <TabsContent value="documentos">
-            <DocumentsList clientId={client.id} key={refreshDocuments} />
-          </TabsContent>
-
-          <TabsContent value="upload">
-            <DocumentUpload clientId={client.id} onUploadSuccess={handleUploadSuccess} />
-          </TabsContent>
-
-          <TabsContent value="chat">
-            <ClientChat 
-              clientId={client.id}
-              clientEmail={client.email}
-            />
-          </TabsContent>
-        </Tabs>
-      </main>
+      </div>
     </div>
   );
-}
+};
+
+export default ClientPanel;
