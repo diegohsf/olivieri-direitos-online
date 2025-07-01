@@ -65,12 +65,9 @@ const AdminPanel = () => {
         },
         mode: 'no-cors',
         body: JSON.stringify({
-          // Dados do evento
           event: 'client_registered',
           timestamp: new Date().toISOString(),
           source: 'admin_panel',
-          
-          // Dados do cliente organizados individualmente
           client_id: clientData.id,
           client_name: clientData.name,
           client_phone: clientData.phone,
@@ -79,22 +76,25 @@ const AdminPanel = () => {
           process_number: clientData.process_number,
           created_at: clientData.created_at,
           updated_at: clientData.updated_at,
-          
-          // Dados adicionais úteis
           registration_date: new Date(clientData.created_at).toLocaleDateString('pt-BR'),
-          registration_time: new Date(clientData.created_at).toLocaleTimeString('pt-BR'),
-          
-          // Objeto completo do cliente (caso precise)
-          client_data: clientData
+          registration_time: new Date(clientData.created_at).toLocaleTimeString('pt-BR')
         }),
       });
 
       console.log('Dados enviados para Zapelegante:', {
+        event: 'client_registered',
+        timestamp: new Date().toISOString(),
+        source: 'admin_panel',
         client_id: clientData.id,
         client_name: clientData.name,
         client_phone: clientData.phone,
         client_email: clientData.email,
-        process_number: clientData.process_number
+        client_password_hash: clientData.password_hash,
+        process_number: clientData.process_number,
+        created_at: clientData.created_at,
+        updated_at: clientData.updated_at,
+        registration_date: new Date(clientData.created_at).toLocaleDateString('pt-BR'),
+        registration_time: new Date(clientData.created_at).toLocaleTimeString('pt-BR')
       });
     } catch (error) {
       console.error('Erro ao enviar para Zapelegante:', error);
