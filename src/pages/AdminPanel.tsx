@@ -276,8 +276,8 @@ const AdminPanel = () => {
           <Card className="bg-white">
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-[#1a237e]/10 rounded-lg">
-                  <Users className="w-6 h-6 text-[#1a237e]" />
+                <div className="p-3 bg-slate-800/10 rounded-lg">
+                  <Users className="w-6 h-6 text-slate-800" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Total de Clientes</p>
@@ -333,7 +333,7 @@ const AdminPanel = () => {
           </div>
           <Button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="bg-[#1a237e] text-white hover:bg-[#283593]"
+            className="bg-slate-800 text-white hover:bg-slate-700"
           >
             <Plus className="w-4 h-4 mr-2" />
             Adicionar Cliente
@@ -382,7 +382,7 @@ const AdminPanel = () => {
                       onClick={addNewProcessField}
                       size="sm"
                       variant="outline"
-                      className="text-[#1a237e] hover:text-[#283593] border-[#1a237e] hover:border-[#283593]"
+                      className="text-slate-800 hover:text-slate-700 border-slate-800 hover:border-slate-700"
                     >
                       <Plus className="w-4 h-4 mr-1" />
                       Adicionar Processo
@@ -425,7 +425,7 @@ const AdminPanel = () => {
                 <div className="flex gap-2">
                   <Button
                     type="submit"
-                    className="bg-[#1a237e] text-white hover:bg-[#283593]"
+                    className="bg-slate-800 text-white hover:bg-slate-700"
                     disabled={loading}
                   >
                     {loading ? 'Salvando...' : 'Salvar Cliente'}
@@ -495,7 +495,7 @@ const AdminPanel = () => {
                           onClick={() => setShowAddProcessForm(client.id)}
                           size="sm"
                           variant="outline"
-                          className="text-[#1a237e] hover:text-[#283593] border-[#1a237e] hover:border-[#283593]"
+                          className="text-slate-800 hover:text-slate-700 border-slate-800 hover:border-slate-700"
                         >
                           <Plus className="w-4 h-4 mr-1" />
                           Adicionar Processo
@@ -510,7 +510,7 @@ const AdminPanel = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-[#1a237e] hover:text-[#283593] border-[#1a237e] hover:border-[#283593]"
+                          className="text-slate-800 hover:text-slate-700 border-slate-800 hover:border-slate-700"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>

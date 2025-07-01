@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -117,7 +116,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Top Bar */}
-      <div className="bg-[#1a237e] text-white py-2">
+      <div className="bg-slate-800 text-white py-2">
         <div className="container mx-auto px-4 flex items-center justify-between text-sm">
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2">
@@ -133,7 +132,7 @@ const Index = () => {
             <span>Atuamos em todo Território Nacional de Forma 100% Digital</span>
             <Button 
               size="sm" 
-              className="bg-[#ffd700] text-[#1a237e] hover:bg-[#ffed4e] font-medium"
+              className="bg-yellow-500 text-slate-800 hover:bg-yellow-600 font-medium"
             >
               <a href="/cliente-login">🔐 Área do Cliente</a>
             </Button>
@@ -142,7 +141,7 @@ const Index = () => {
       </div>
 
       {/* Header */}
-      <header className="bg-white text-[#1a237e] shadow-lg sticky top-0 z-50 border-b">
+      <header className="bg-white text-slate-800 shadow-lg sticky top-0 z-50 border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -152,19 +151,19 @@ const Index = () => {
                 className="h-12 w-auto"
               />
               <div>
-                <h1 className="text-2xl font-bold text-[#1a237e]">Luis Augusto Olivieri</h1>
+                <h1 className="text-2xl font-bold text-slate-800">Luis Augusto Olivieri</h1>
                 <p className="text-sm text-gray-600">Sociedade de Advogados</p>
               </div>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="hover:text-[#ffd700] transition-colors font-medium border-b-2 border-[#1a237e]">Início</a>
-              <a href="/sobre" className="hover:text-[#ffd700] transition-colors">Sobre</a>
-              <a href="/especialidades" className="hover:text-[#ffd700] transition-colors">Especialidades</a>
-              <a href="/depoimentos" className="hover:text-[#ffd700] transition-colors">Depoimentos</a>
-              <a href="/contato" className="hover:text-[#ffd700] transition-colors">Contato</a>
+              <a href="/" className="hover:text-yellow-500 transition-colors font-medium border-b-2 border-slate-800">Início</a>
+              <a href="/sobre" className="hover:text-yellow-500 transition-colors">Sobre</a>
+              <a href="/especialidades" className="hover:text-yellow-500 transition-colors">Especialidades</a>
+              <a href="/depoimentos" className="hover:text-yellow-500 transition-colors">Depoimentos</a>
+              <a href="/contato" className="hover:text-yellow-500 transition-colors">Contato</a>
               <Button 
                 size="sm" 
-                className="bg-[#1a237e] text-white hover:bg-[#283593] font-medium"
+                className="bg-slate-800 text-white hover:bg-slate-700 font-medium"
               >
                 <a href="/cliente-login">👤 Área do Cliente</a>
               </Button>
@@ -178,40 +177,40 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <Badge className="bg-amber-500 text-slate-800 mb-4 font-medium">OAB/SP 252.648</Badge>
+              <Badge className="bg-yellow-500 text-slate-800 mb-4 font-medium">OAB/SP 252.648</Badge>
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 Seus Direitos<br />
-                <span className="text-amber-400">Previdenciários</span>
+                <span className="text-yellow-400">Previdenciários</span>
               </h1>
               <p className="text-xl mb-8 text-gray-300">
                 Especialista em Direito Previdenciário e Trabalhista com mais de 15 anos de experiência. Atuamos em todo território nacional de forma 100% digital.
               </p>
               <div className="flex flex-wrap gap-8 mb-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-amber-400">800+</div>
+                  <div className="text-3xl font-bold text-yellow-400">800+</div>
                   <div className="text-sm text-gray-300">Benefícios Conquistados</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-amber-400">15+</div>
+                  <div className="text-3xl font-bold text-yellow-400">15+</div>
                   <div className="text-sm text-gray-300">Anos de Experiência</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-amber-400">100%</div>
+                  <div className="text-3xl font-bold text-yellow-400">100%</div>
                   <div className="text-sm text-gray-300">Atendimento Digital</div>
                 </div>
               </div>
               <div className="flex gap-4">
-                <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-slate-800 font-medium">
+                <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 font-medium">
                   <a href="#contato">Fale Conosco</a>
                 </Button>
-                <Button size="lg" variant="outline" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-800">
+                <Button size="lg" variant="outline" className="border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-slate-800">
                   WhatsApp
                 </Button>
               </div>
             </div>
             <div className="bg-slate-700/50 backdrop-blur-sm rounded-lg p-6 border border-slate-600">
               <div className="flex items-center mb-4">
-                <MessageCircle className="w-6 h-6 text-amber-400 mr-2" />
+                <MessageCircle className="w-6 h-6 text-yellow-400 mr-2" />
                 <h3 className="text-xl font-semibold text-center">Entre em Contato</h3>
               </div>
               <p className="text-gray-300 text-center mb-6">Descreva seu caso previdenciário ou trabalhista</p>
@@ -251,7 +250,7 @@ const Index = () => {
                 />
                 <Button 
                   type="submit" 
-                  className="w-full bg-amber-500 hover:bg-amber-600 text-slate-800 font-medium"
+                  className="w-full bg-yellow-500 hover:bg-yellow-600 text-slate-800 font-medium"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? 'Enviando...' : '✈️ Enviar Mensagem'}
@@ -279,19 +278,19 @@ const Index = () => {
                   <img src="/lovable-uploads/f7c000e0-5104-4e8a-bdf4-0c193e78c323.png" alt="Dr. Luis Augusto Olivieri" className="w-full h-full object-cover" />
                 </div>
                 <h3 className="text-xl font-semibold">Dr. Luis Augusto Olivieri</h3>
-                <p className="text-amber-400">OAB/SP 252.648</p>
+                <p className="text-yellow-400">OAB/SP 252.648</p>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <Award className="w-5 h-5 text-amber-400" />
+                  <Award className="w-5 h-5 text-yellow-400" />
                   <span>Especialista em Direito Previdenciário</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <Users className="w-5 h-5 text-amber-400" />
+                  <Users className="w-5 h-5 text-yellow-400" />
                   <span>Mais de 800 casos resolvidos</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <Clock className="w-5 h-5 text-amber-400" />
+                  <Clock className="w-5 h-5 text-yellow-400" />
                   <span>15+ anos de experiência</span>
                 </div>
               </div>
@@ -305,15 +304,15 @@ const Index = () => {
                 de trabalhadores e segurados do INSS.
               </p>
               <div className="grid grid-cols-2 gap-4">
-                <Card className="border-amber-200">
+                <Card className="border-yellow-200">
                   <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-amber-600">95%</div>
+                    <div className="text-2xl font-bold text-yellow-600">95%</div>
                     <div className="text-sm text-gray-600">Taxa de Sucesso</div>
                   </CardContent>
                 </Card>
-                <Card className="border-amber-200">
+                <Card className="border-yellow-200">
                   <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-amber-600">24h</div>
+                    <div className="text-2xl font-bold text-yellow-600">24h</div>
                     <div className="text-sm text-gray-600">Resposta Máxima</div>
                   </CardContent>
                 </Card>
@@ -335,10 +334,10 @@ const Index = () => {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {specialties.map((specialty, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow border-amber-200 hover:border-amber-400">
+              <Card key={index} className="hover:shadow-lg transition-shadow border-yellow-200 hover:border-yellow-400">
                 <CardHeader>
-                  <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
-                    <div className="text-amber-600">{specialty.icon}</div>
+                  <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
+                    <div className="text-yellow-600">{specialty.icon}</div>
                   </div>
                   <CardTitle className="text-xl text-slate-800">{specialty.title}</CardTitle>
                 </CardHeader>
@@ -360,7 +359,7 @@ const Index = () => {
           <p className="text-xl mb-8 text-gray-300">
             Cada caso é único e específico. Entre em contato para uma análise personalizada da sua situação.
           </p>
-          <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-slate-800 font-medium">
+          <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 font-medium">
             <a href="#contato">Fale Conosco Agora</a>
           </Button>
         </div>
@@ -378,15 +377,15 @@ const Index = () => {
           
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow border-amber-200">
+              <Card key={index} className="hover:shadow-lg transition-shadow border-yellow-200">
                 <CardHeader>
                   <div className="flex items-center space-x-1 mb-2">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
                   <CardTitle className="text-lg text-slate-800">{testimonial.name}</CardTitle>
-                  <CardDescription className="text-amber-600 font-medium">
+                  <CardDescription className="text-yellow-600 font-medium">
                     {testimonial.case}
                   </CardDescription>
                 </CardHeader>
@@ -399,15 +398,15 @@ const Index = () => {
 
           <div className="text-center grid grid-cols-3 gap-8 max-w-2xl mx-auto">
             <div>
-              <div className="text-3xl font-bold text-amber-600">95%</div>
+              <div className="text-3xl font-bold text-yellow-600">95%</div>
               <div className="text-gray-600">Taxa de Sucesso</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-amber-600">800+</div>
+              <div className="text-3xl font-bold text-yellow-600">800+</div>
               <div className="text-gray-600">Casos Resolvidos</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-amber-600">1500+</div>
+              <div className="text-3xl font-bold text-yellow-600">1500+</div>
               <div className="text-gray-600">Clientes Atendidos</div>
             </div>
           </div>
@@ -430,7 +429,7 @@ const Index = () => {
               
               <div className="space-y-4">
                 <div className="flex items-start space-x-4">
-                  <MapPin className="w-6 h-6 text-amber-600 mt-1" />
+                  <MapPin className="w-6 h-6 text-yellow-600 mt-1" />
                   <div>
                     <h4 className="font-semibold text-slate-800">Endereço</h4>
                     <p className="text-gray-600">
@@ -442,7 +441,7 @@ const Index = () => {
                 </div>
                 
                 <div className="flex items-center space-x-4">
-                  <Phone className="w-6 h-6 text-amber-600" />
+                  <Phone className="w-6 h-6 text-yellow-600" />
                   <div>
                     <h4 className="font-semibold text-slate-800">Telefone Fixo</h4>
                     <p className="text-gray-600">(11) 3380-6725</p>
@@ -450,7 +449,7 @@ const Index = () => {
                 </div>
                 
                 <div className="flex items-center space-x-4">
-                  <MessageCircle className="w-6 h-6 text-amber-600" />
+                  <MessageCircle className="w-6 h-6 text-yellow-600" />
                   <div>
                     <h4 className="font-semibold text-slate-800">WhatsApp</h4>
                     <p className="text-gray-600">(11) 94792-8925</p>
@@ -470,7 +469,7 @@ const Index = () => {
               </div>
             </div>
             
-            <Card className="border-amber-200">
+            <Card className="border-yellow-200">
               <CardHeader>
                 <CardTitle className="text-slate-800">Fale Conosco</CardTitle>
                 <CardDescription>
@@ -486,7 +485,7 @@ const Index = () => {
                       value={formData.name}
                       onChange={handleInputChange}
                       required
-                      className="border-amber-200 focus:border-amber-400"
+                      className="border-yellow-200 focus:border-yellow-400"
                     />
                     <Input
                       name="email"
@@ -495,7 +494,7 @@ const Index = () => {
                       value={formData.email}
                       onChange={handleInputChange}
                       required
-                      className="border-amber-200 focus:border-amber-400"
+                      className="border-yellow-200 focus:border-yellow-400"
                     />
                   </div>
                   <Input
@@ -504,7 +503,7 @@ const Index = () => {
                     value={formData.phone}
                     onChange={handleInputChange}
                     required
-                    className="border-amber-200 focus:border-amber-400"
+                    className="border-yellow-200 focus:border-yellow-400"
                   />
                   <Textarea
                     name="message"
@@ -512,9 +511,9 @@ const Index = () => {
                     value={formData.message}
                     onChange={handleInputChange}
                     rows={4}
-                    className="border-amber-200 focus:border-amber-400"
+                    className="border-yellow-200 focus:border-yellow-400"
                   />
-                  <Button type="submit" className="w-full bg-amber-500 hover:bg-amber-600 text-slate-800 font-medium" disabled={isSubmitting}>
+                  <Button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-600 text-slate-800 font-medium" disabled={isSubmitting}>
                     {isSubmitting ? 'Enviando...' : 'Enviar Mensagem'}
                   </Button>
                 </form>
@@ -536,7 +535,7 @@ const Index = () => {
               <p className="text-gray-400 mb-4">
                 Advogado especialista em Direito Previdenciário e Trabalhista
               </p>
-              <Badge className="bg-amber-500 text-slate-800">OAB/SP 252.648</Badge>
+              <Badge className="bg-yellow-500 text-slate-800">OAB/SP 252.648</Badge>
             </div>
             
             <div>
