@@ -45,6 +45,8 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
 
   const initializeConversation = async () => {
     try {
+      console.log('Inicializando conversa para clientId:', clientId);
+      
       // Buscar conversa existente
       const { data: conversation, error: convError } = await supabase
         .from('conversations')
@@ -60,6 +62,7 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
 
       // Se não existe conversa, criar uma nova
       if (!conversation) {
+        console.log('Criando nova conversa para cliente:', clientId);
         const { data: newConv, error: createError } = await supabase
           .from('conversations')
           .insert([{ client_id: clientId }])
@@ -68,6 +71,7 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
 
         if (createError) throw createError;
         convId = newConv.id;
+        console.log('Nova conversa criada:', convId);
       }
 
       setConversationId(convId);
@@ -137,6 +141,13 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
 
     setLoading(true);
     try {
+      console.log('Enviando mensagem:', {
+        conversation_id: conversationId,
+        sender_type: isAdmin ? 'admin' : 'client',
+        sender_id: currentUserId,
+        message_text: newMessage.trim()
+      });
+
       const { error } = await supabase
         .from('chat_messages')
         .insert([{
@@ -146,9 +157,13 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
           message_text: newMessage.trim()
         }]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro detalhado ao enviar mensagem:', error);
+        throw error;
+      }
 
       setNewMessage('');
+      console.log('Mensagem enviada com sucesso');
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);
       toast.error('Erro ao enviar mensagem');
