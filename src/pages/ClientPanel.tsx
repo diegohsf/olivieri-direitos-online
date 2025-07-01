@@ -49,10 +49,11 @@ const ClientPanel = () => {
 
   const fetchProcessData = async (processNumber: string) => {
     try {
+      // Buscar na tabela process_consultations
       const { data, error } = await supabase
-        .from('process_data')
+        .from('process_consultations')
         .select('*')
-        .eq('process_number', processNumber)
+        .eq('numero_processo', processNumber)
         .single();
 
       if (error) {
@@ -62,22 +63,24 @@ const ClientPanel = () => {
         return;
       }
 
-      if (data) {
+      if (data && data.data) {
         console.log('Dados do processo encontrados:', data);
-        setProcessData(data);
         
-        // Processar movimentações dos dados reais - verificar se é array
-        const processMovements = data.movements;
-        if (Array.isArray(processMovements)) {
-          const formattedMovements = processMovements.map((movement: any) => ({
-            date: movement.step_date || movement.date || new Date().toISOString(),
-            description: movement.content || movement.description || 'Movimentação',
-            type: movement.type || 'Movimento',
-            content: movement.content
+        // Extrair dados do processo do campo data (jsonb)
+        const processInfo = data.data.payload?.response_data || data.data;
+        setProcessData({ case_data: processInfo });
+        
+        // Processar movimentações - verificar se existem steps
+        const steps = processInfo.steps || [];
+        if (Array.isArray(steps)) {
+          const formattedMovements = steps.map((step: any) => ({
+            date: step.step_date || new Date().toISOString(),
+            description: step.content || 'Movimentação',
+            type: step.type || 'Movimento',
+            content: step.content
           }));
           setMovements(formattedMovements);
         } else {
-          // Se movements não for array, usar array vazio
           setMovements([]);
         }
       } else {

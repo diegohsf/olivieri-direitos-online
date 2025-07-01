@@ -57,26 +57,27 @@ serve(async (req) => {
 
     console.log('Extracted process number:', processNumber);
 
-    // Check if process already exists
+    // Check if process already exists in process_consultations
     const { data: existingProcess } = await supabase
-      .from('process_data')
+      .from('process_consultations')
       .select('*')
-      .eq('process_number', processNumber)
+      .eq('numero_processo', processNumber)
       .single();
 
+    // Preparar dados para salvar seguindo a estrutura de process_consultations
     const dataToStore = {
-      process_number: processNumber,
-      case_data: processData.payload?.response_data || processData,
-      movements: processData.payload?.response_data?.steps || processData.movements || processData.movimentacoes || [],
-      last_updated: new Date().toISOString()
+      numero_processo: processNumber,
+      data: processData, // Salvar o objeto completo no campo data (jsonb)
+      status: 'completed', // Marcar como completed já que recebemos os dados
+      updated_at: new Date().toISOString()
     };
 
     if (existingProcess) {
       // Update existing process
       const { error: updateError } = await supabase
-        .from('process_data')
+        .from('process_consultations')
         .update(dataToStore)
-        .eq('process_number', processNumber);
+        .eq('numero_processo', processNumber);
 
       if (updateError) {
         console.error('Error updating process:', updateError);
@@ -86,11 +87,11 @@ serve(async (req) => {
         });
       }
 
-      console.log('Process updated successfully:', processNumber);
+      console.log('Process updated successfully in process_consultations:', processNumber);
     } else {
       // Insert new process
       const { error: insertError } = await supabase
-        .from('process_data')
+        .from('process_consultations')
         .insert(dataToStore);
 
       if (insertError) {
@@ -101,13 +102,13 @@ serve(async (req) => {
         });
       }
 
-      console.log('Process inserted successfully:', processNumber);
+      console.log('Process inserted successfully in process_consultations:', processNumber);
     }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Process data received and stored successfully',
+        message: 'Process data received and stored successfully in process_consultations',
         process_number: processNumber
       }), 
       { 
