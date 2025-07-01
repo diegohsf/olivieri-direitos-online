@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LogOut, Plus, Trash2, Users, Eye, UserPlus, Search, Edit } from "lucide-react";
+import { LogOut, Plus, Trash2, Users, Eye, UserPlus, Search, Edit, X } from "lucide-react";
 import AddProcessForm from "@/components/admin/AddProcessForm";
 import ClientProcessesList from "@/components/admin/ClientProcessesList";
 
@@ -35,7 +34,7 @@ const AdminPanel = () => {
     name: '',
     phone: '',
     email: '',
-    process_number: ''
+    process_numbers: [''] // Array para múltiplos processos
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
@@ -105,10 +104,10 @@ const AdminPanel = () => {
     return password;
   };
 
-  const sendToZapelegante = async (clientData: any) => {
+  const sendToZapelegante = async (clientData: any, processNumber: string) => {
     try {
       const payload = {
-        processNumber: clientData.process_number,
+        processNumber: processNumber,
         clientId: clientData.id,
         clientName: clientData.name,
         clientPhone: clientData.phone,
@@ -135,6 +134,31 @@ const AdminPanel = () => {
     }
   };
 
+  const addNewProcessField = () => {
+    setFormData(prev => ({
+      ...prev,
+      process_numbers: [...prev.process_numbers, '']
+    }));
+  };
+
+  const removeProcessField = (index: number) => {
+    if (formData.process_numbers.length > 1) {
+      setFormData(prev => ({
+        ...prev,
+        process_numbers: prev.process_numbers.filter((_, i) => i !== index)
+      }));
+    }
+  };
+
+  const updateProcessNumber = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      process_numbers: prev.process_numbers.map((process, i) => 
+        i === index ? value : process
+      )
+    }));
+  };
+
   const handleAddClient = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -142,7 +166,16 @@ const AdminPanel = () => {
     try {
       const generatedPassword = generateRandomPassword();
       
-      // Insert client data without process_number - it goes to client_processes table instead
+      // Filtrar processos não vazios
+      const validProcesses = formData.process_numbers.filter(process => process.trim() !== '');
+      
+      if (validProcesses.length === 0) {
+        toast.error('Adicione pelo menos um número de processo');
+        setLoading(false);
+        return;
+      }
+
+      // Insert client data (usando o primeiro processo para compatibilidade)
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .insert([{
@@ -150,31 +183,35 @@ const AdminPanel = () => {
           phone: formData.phone,
           email: formData.email,
           password_hash: generatedPassword,
-          process_number: formData.process_number // Keep this for now to maintain compatibility
+          process_number: validProcesses[0] // Usar o primeiro processo para compatibilidade
         }])
         .select()
         .single();
 
       if (clientError) throw clientError;
 
-      // Add the first process to the client_processes table
+      // Inserir todos os processos na tabela client_processes
+      const processesToInsert = validProcesses.map(processNumber => ({
+        client_id: clientData.id,
+        process_number: processNumber
+      }));
+
       const { error: processError } = await supabase
         .from('client_processes')
-        .insert([{
-          client_id: clientData.id,
-          process_number: formData.process_number
-        }]);
+        .insert(processesToInsert);
 
       if (processError) throw processError;
 
-      await sendToZapelegante({
-        ...clientData,
-        process_number: formData.process_number,
-        password_hash: generatedPassword
-      });
+      // Enviar webhook separado para cada processo
+      for (const processNumber of validProcesses) {
+        await sendToZapelegante({
+          ...clientData,
+          password_hash: generatedPassword
+        }, processNumber);
+      }
 
-      toast.success(`Cliente adicionado com sucesso! Senha gerada: ${generatedPassword}`);
-      setFormData({ name: '', phone: '', email: '', process_number: '' });
+      toast.success(`Cliente adicionado com sucesso! ${validProcesses.length} processo(s) cadastrado(s). Senha gerada: ${generatedPassword}`);
+      setFormData({ name: '', phone: '', email: '', process_numbers: [''] });
       setShowAddForm(false);
       fetchClients();
     } catch (error) {
@@ -310,39 +347,82 @@ const AdminPanel = () => {
               <CardTitle className="text-lg">Adicionar Novo Cliente</CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleAddClient} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  placeholder="Nome completo"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-                <Input
-                  placeholder="Telefone"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  required
-                />
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                />
-                <Input
-                  placeholder="Número do Processo CNJ"
-                  value={formData.process_number}
-                  onChange={(e) => setFormData({ ...formData, process_number: e.target.value })}
-                  required
-                  className="md:col-span-2"
-                />
-                <div className="md:col-span-2">
+              <form onSubmit={handleAddClient} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    placeholder="Nome completo"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                  />
+                  <Input
+                    placeholder="Telefone"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    required
+                  />
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
+                    className="md:col-span-2"
+                  />
+                </div>
+
+                {/* Campos de Processos */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-gray-700">
+                      Números dos Processos CNJ
+                    </label>
+                    <Button
+                      type="button"
+                      onClick={addNewProcessField}
+                      size="sm"
+                      variant="outline"
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Adicionar Processo
+                    </Button>
+                  </div>
+                  
+                  {formData.process_numbers.map((processNumber, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        placeholder={`Processo ${index + 1} - Número CNJ`}
+                        value={processNumber}
+                        onChange={(e) => updateProcessNumber(index, e.target.value)}
+                        required={index === 0}
+                        className="flex-1"
+                      />
+                      {formData.process_numbers.length > 1 && (
+                        <Button
+                          type="button"
+                          onClick={() => removeProcessField(index)}
+                          size="sm"
+                          variant="outline"
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div>
                   <p className="text-sm text-gray-600 mb-2">
                     ℹ️ A senha será gerada automaticamente e exibida após o cadastro
                   </p>
+                  <p className="text-sm text-gray-600 mb-2">
+                    ℹ️ Um webhook será enviado separadamente para cada processo cadastrado
+                  </p>
                 </div>
-                <div className="md:col-span-2 flex gap-2">
+                
+                <div className="flex gap-2">
                   <Button
                     type="submit"
                     className="bg-[#1a237e] text-white hover:bg-[#283593]"
