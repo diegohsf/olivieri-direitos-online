@@ -19,12 +19,14 @@ const ClientLogin = () => {
     setLoading(true);
 
     try {
-      // Credenciais de demonstração para teste
-      if (email === 'cliente@demo.com' && password === 'demo123') {
+      // Credenciais de demonstração conforme a imagem
+      if ((email === 'admin@luisolivieri.com.br' && password === 'admin123') ||
+          (email === 'cliente@demo.com' && password === 'demo123')) {
+        
         const mockClient = {
           id: '1',
-          name: 'Cliente Demonstração',
-          email: 'cliente@demo.com',
+          name: email === 'admin@luisolivieri.com.br' ? 'Administrador' : 'Cliente Demonstração',
+          email: email,
           phone: '(11) 99999-9999',
           process_number: '1234567-89.2023.1.00.0001'
         };
@@ -66,7 +68,7 @@ const ClientLogin = () => {
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   type="email"
-                  placeholder="seu@email.com"
+                  placeholder="admin@luisolivieri.com.br"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -81,7 +83,7 @@ const ClientLogin = () => {
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Sua senha"
+                  placeholder="admin123"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
