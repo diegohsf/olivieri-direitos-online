@@ -1,16 +1,23 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  if (req.method !== 'POST') {
+    return new Response('Method not allowed', { 
+      status: 405, 
+      headers: corsHeaders 
+    });
   }
 
   try {
@@ -19,84 +26,74 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const body = await req.json();
-    console.log('Webhook recebido:', body);
+    const processData = await req.json();
+    console.log('Received process data:', processData);
 
-    const { process_number, case_data, movements } = body;
-
-    if (!process_number) {
-      return new Response(
-        JSON.stringify({ error: 'process_number é obrigatório' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+    const processNumber = processData.process_number || processData.numero_processo;
+    
+    if (!processNumber) {
+      console.error('Process number is required');
+      return new Response('Process number is required', { 
+        status: 400, 
+        headers: corsHeaders 
+      });
     }
 
-    // Buscar o cliente pelo número do processo
-    const { data: client, error: clientError } = await supabase
-      .from('clients')
-      .select('id')
-      .eq('process_number', process_number)
+    // Check if process already exists
+    const { data: existingProcess } = await supabase
+      .from('process_data')
+      .select('*')
+      .eq('process_number', processNumber)
       .single();
 
-    if (clientError || !client) {
-      console.error('Cliente não encontrado:', clientError);
-      return new Response(
-        JSON.stringify({ error: 'Cliente não encontrado para este processo' }),
-        { 
-          status: 404, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
+    if (existingProcess) {
+      // Update existing process
+      const { error: updateError } = await supabase
+        .from('process_data')
+        .update({
+          case_data: processData.case_data || processData,
+          movements: processData.movements || processData.movimentacoes || [],
+          last_updated: new Date().toISOString()
+        })
+        .eq('process_number', processNumber);
 
-    // Inserir ou atualizar os dados do processo
-    const { error: upsertError } = await supabase
-      .from('process_data')
-      .upsert({
-        process_number,
-        client_id: client.id,
-        case_data,
-        movements,
-        last_updated: new Date().toISOString()
-      }, {
-        onConflict: 'process_number'
-      });
-
-    if (upsertError) {
-      console.error('Erro ao salvar dados do processo:', upsertError);
-      return new Response(
-        JSON.stringify({ error: 'Erro ao salvar dados do processo' }),
-        { 
+      if (updateError) {
+        console.error('Error updating process:', updateError);
+        return new Response('Error updating process', { 
           status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+          headers: corsHeaders 
+        });
+      }
+
+      console.log('Process updated successfully:', processNumber);
+    } else {
+      // Insert new process
+      const { error: insertError } = await supabase
+        .from('process_data')
+        .insert({
+          process_number: processNumber,
+          case_data: processData.case_data || processData,
+          movements: processData.movements || processData.movimentacoes || [],
+          last_updated: new Date().toISOString()
+        });
+
+      if (insertError) {
+        console.error('Error inserting process:', insertError);
+        return new Response('Error inserting process', { 
+          status: 500, 
+          headers: corsHeaders 
+        });
+      }
+
+      console.log('Process inserted successfully:', processNumber);
     }
-
-    // Atualizar status das solicitações pendentes
-    const { error: updateError } = await supabase
-      .from('process_update_requests')
-      .update({ 
-        status: 'completed',
-        completed_at: new Date().toISOString()
-      })
-      .eq('client_id', client.id)
-      .eq('status', 'pending');
-
-    if (updateError) {
-      console.error('Erro ao atualizar solicitações:', updateError);
-    }
-
-    console.log('Dados do processo atualizados com sucesso');
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Dados do processo atualizados com sucesso' 
-      }),
+        message: 'Process data received and stored successfully',
+        process_number: processNumber
+      }), 
       { 
         status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -104,13 +101,10 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Erro no webhook:', error);
-    return new Response(
-      JSON.stringify({ error: 'Erro interno do servidor' }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+    console.error('Error processing webhook:', error);
+    return new Response('Internal server error', { 
+      status: 500, 
+      headers: corsHeaders 
+    });
   }
 });

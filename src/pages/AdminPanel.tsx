@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -36,7 +35,7 @@ const AdminPanel = () => {
     // Verificar autenticação admin
     const adminAuth = localStorage.getItem('adminAuth');
     if (!adminAuth) {
-      navigate('/admin-login');
+      navigate('/login');
       return;
     }
     
@@ -57,22 +56,49 @@ const AdminPanel = () => {
     }
   };
 
+  const sendToZapelegante = async (clientData: any) => {
+    try {
+      const response = await fetch('https://webhook.zapelegante.com.br/webhook/e87de2ba-baa4-4421-a8eb-821e537f9da2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        mode: 'no-cors',
+        body: JSON.stringify({
+          event: 'client_registered',
+          client: clientData,
+          timestamp: new Date().toISOString(),
+          source: 'admin_panel'
+        }),
+      });
+
+      console.log('Dados enviados para Zapelegante:', clientData);
+    } catch (error) {
+      console.error('Erro ao enviar para Zapelegante:', error);
+    }
+  };
+
   const handleAddClient = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('clients')
         .insert([{
           name: formData.name,
           phone: formData.phone,
           email: formData.email,
-          password_hash: formData.password, // Em produção, use hash adequado
+          password_hash: formData.password,
           process_number: formData.process_number
-        }]);
+        }])
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Enviar dados para o webhook do Zapelegante
+      await sendToZapelegante(data);
 
       toast.success('Cliente adicionado com sucesso!');
       setFormData({ name: '', phone: '', email: '', password: '', process_number: '' });
@@ -105,7 +131,7 @@ const AdminPanel = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('adminAuth');
-    navigate('/admin-login');
+    navigate('/login');
   };
 
   const filteredClients = clients.filter(client =>
