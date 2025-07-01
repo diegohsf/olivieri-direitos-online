@@ -126,6 +126,38 @@ export type Database = {
         }
         Relationships: []
       }
+      client_processes: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          process_number: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          process_number: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          process_number?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_processes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           created_at: string

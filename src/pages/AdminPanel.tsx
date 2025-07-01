@@ -7,20 +7,29 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LogOut, Plus, Trash2, Users, Eye, UserPlus, Search, Edit } from "lucide-react";
+import AddProcessForm from "@/components/admin/AddProcessForm";
+import ClientProcessesList from "@/components/admin/ClientProcessesList";
 
 interface Client {
   id: string;
   name: string;
   phone: string;
   email: string;
-  process_number: string;
   created_at: string;
   password_hash: string;
 }
 
+interface ClientProcess {
+  id: string;
+  process_number: string;
+  created_at: string;
+}
+
 const AdminPanel = () => {
   const [clients, setClients] = useState<Client[]>([]);
+  const [clientProcesses, setClientProcesses] = useState<{[key: string]: ClientProcess[]}>({});
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showAddProcessForm, setShowAddProcessForm] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -51,8 +60,37 @@ const AdminPanel = () => {
 
       if (error) throw error;
       setClients(data || []);
+      
+      // Buscar processos para cada cliente
+      if (data) {
+        await fetchClientProcesses(data.map(c => c.id));
+      }
     } catch (error) {
       toast.error('Erro ao carregar clientes');
+    }
+  };
+
+  const fetchClientProcesses = async (clientIds: string[]) => {
+    try {
+      const { data, error } = await supabase
+        .from('client_processes')
+        .select('*')
+        .in('client_id', clientIds)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const processesMap: {[key: string]: ClientProcess[]} = {};
+      data?.forEach(process => {
+        if (!processesMap[process.client_id]) {
+          processesMap[process.client_id] = [];
+        }
+        processesMap[process.client_id].push(process);
+      });
+
+      setClientProcesses(processesMap);
+    } catch (error) {
+      console.error('Erro ao carregar processos:', error);
     }
   };
 
@@ -68,7 +106,6 @@ const AdminPanel = () => {
 
   const sendToZapelegante = async (clientData: any) => {
     try {
-      // Criar um payload simples com campos separados
       const payload = {
         processNumber: clientData.process_number,
         clientId: clientData.id,
@@ -102,27 +139,35 @@ const AdminPanel = () => {
     setLoading(true);
 
     try {
-      // Gerar senha automaticamente
       const generatedPassword = generateRandomPassword();
       
-      const { data, error } = await supabase
+      const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .insert([{
           name: formData.name,
           phone: formData.phone,
           email: formData.email,
-          password_hash: generatedPassword, // Usando a senha gerada
-          process_number: formData.process_number
+          password_hash: generatedPassword
         }])
         .select()
         .single();
 
-      if (error) throw error;
+      if (clientError) throw clientError;
 
-      // Enviar dados para o webhook do Zapelegante
+      // Adicionar o primeiro processo
+      const { error: processError } = await supabase
+        .from('client_processes')
+        .insert([{
+          client_id: clientData.id,
+          process_number: formData.process_number
+        }]);
+
+      if (processError) throw processError;
+
       await sendToZapelegante({
-        ...data,
-        password_hash: generatedPassword // Garantir que a senha gerada seja enviada
+        ...clientData,
+        process_number: formData.process_number,
+        password_hash: generatedPassword
       });
 
       toast.success(`Cliente adicionado com sucesso! Senha gerada: ${generatedPassword}`);
@@ -162,16 +207,8 @@ const AdminPanel = () => {
 
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.process_number.toLowerCase().includes(searchTerm.toLowerCase())
+    client.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const totalClients = clients.length;
-  const newThisMonth = clients.filter(client => {
-    const created = new Date(client.created_at);
-    const now = new Date();
-    return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
-  }).length;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -323,6 +360,19 @@ const AdminPanel = () => {
           </Card>
         )}
 
+        {/* Add Process Form */}
+        {showAddProcessForm && (
+          <AddProcessForm
+            clientId={showAddProcessForm}
+            clientName={clients.find(c => c.id === showAddProcessForm)?.name || ''}
+            onProcessAdded={() => {
+              setShowAddProcessForm(null);
+              fetchClients();
+            }}
+            onCancel={() => setShowAddProcessForm(null)}
+          />
+        )}
+
         {/* Clients Table */}
         <Card className="bg-white">
           <CardContent className="p-0">
@@ -331,18 +381,13 @@ const AdminPanel = () => {
                 <TableRow className="bg-gray-50">
                   <TableHead className="font-semibold">CLIENTE</TableHead>
                   <TableHead className="font-semibold">CONTATO</TableHead>
-                  <TableHead className="font-semibold">PROCESSO</TableHead>
+                  <TableHead className="font-semibold">PROCESSOS</TableHead>
                   <TableHead className="font-semibold">SENHA</TableHead>
-                  <TableHead className="font-semibold">ÚLTIMO ACESSO</TableHead>
                   <TableHead className="font-semibold">AÇÕES</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {clients.filter(client =>
-                  client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  client.process_number.toLowerCase().includes(searchTerm.toLowerCase())
-                ).map((client) => (
+                {filteredClients.map((client) => (
                   <TableRow key={client.id} className="hover:bg-gray-50">
                     <TableCell>
                       <div>
@@ -357,15 +402,25 @@ const AdminPanel = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
-                        {client.process_number}
-                      </span>
+                      <div className="space-y-2">
+                        <ClientProcessesList
+                          clientId={client.id}
+                          processes={clientProcesses[client.id] || []}
+                          onProcessDeleted={fetchClients}
+                        />
+                        <Button
+                          onClick={() => setShowAddProcessForm(client.id)}
+                          size="sm"
+                          variant="outline"
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Adicionar Processo
+                        </Button>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-gray-600">{client.password_hash}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-gray-500">Nunca</span>
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
