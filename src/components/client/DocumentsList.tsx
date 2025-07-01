@@ -154,99 +154,182 @@ const DocumentsList = ({ clientId, isAdmin = false, refreshTrigger }: DocumentsL
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        {documents.length === 0 ? (
-          <div className="text-center py-8 text-gray-600">
-            <FileText className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <p>Nenhum documento encontrado</p>
-            <p className="text-sm">Faça o upload de documentos para começar</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Arquivo</TableHead>
-                  <TableHead>Descrição</TableHead>
-                  <TableHead>Tamanho</TableHead>
-                  <TableHead>Enviado por</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {documents.map((doc) => (
-                  <TableRow key={doc.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">{getFileIcon(doc.file_type)}</span>
-                        <div>
-                          <p className="font-medium text-sm">{doc.file_name}</p>
-                          <p className="text-xs text-gray-500">{doc.file_type}</p>
+        {/* Versão mobile - cards responsivos */}
+        <div className="lg:hidden">
+          {documents.length === 0 ? (
+            <div className="text-center py-8 text-gray-600">
+              <FileText className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+              <p>Nenhum documento encontrado</p>
+              <p className="text-sm">Faça o upload de documentos para começar</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {documents.map((doc) => (
+                <Card key={doc.id} className="bg-white border">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <span className="text-2xl flex-shrink-0">{getFileIcon(doc.file_type)}</span>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-sm truncate">{doc.file_name}</h3>
+                          <p className="text-xs text-gray-500 truncate">{doc.file_type}</p>
+                          {doc.description && (
+                            <p className="text-xs text-gray-600 mt-1 line-clamp-2">{doc.description}</p>
+                          )}
                         </div>
                       </div>
-                    </TableCell>
-                    <TableCell className="max-w-xs">
-                      <p className="text-sm text-gray-600 truncate">
-                        {doc.description || 'Sem descrição'}
-                      </p>
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {formatFileSize(doc.file_size)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2 text-sm">
-                        <User className="w-4 h-4" />
-                        {doc.uploaded_by_admin ? 'Advogado' : 'Cliente'}
+                      
+                      <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                          <User className="w-3 h-3" />
+                          {doc.uploaded_by_admin ? 'Adv' : 'Cliente'}
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                          <Calendar className="w-3 h-3" />
+                          {formatDistanceToNow(new Date(doc.created_at), { 
+                            addSuffix: true, 
+                            locale: ptBR 
+                          })}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {formatFileSize(doc.file_size)}
+                        </div>
                       </div>
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        {formatDistanceToNow(new Date(doc.created_at), { 
-                          addSuffix: true, 
-                          locale: ptBR 
-                        })}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
+                    </div>
+                    
+                    <div className="flex gap-2 mt-3 pt-3 border-t">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => viewFile(doc.file_path, doc.file_name)}
+                        className="text-blue-600 hover:text-blue-800 flex-1"
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        Ver
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => downloadFile(doc.file_path, doc.file_name)}
+                        className="text-primary hover:text-primary/80 flex-1"
+                      >
+                        <Download className="w-4 h-4 mr-1" />
+                        Baixar
+                      </Button>
+                      {isAdmin && (
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => viewFile(doc.file_path, doc.file_name)}
-                          className="text-blue-600 hover:text-blue-800"
-                          title="Visualizar arquivo"
+                          onClick={() => deleteDocument(doc.id, doc.file_path)}
+                          className="text-red-600 hover:text-red-800"
                         >
-                          <Eye className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" />
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => downloadFile(doc.file_path, doc.file_name)}
-                          className="text-primary hover:text-primary/80"
-                          title="Baixar arquivo"
-                        >
-                          <Download className="w-4 h-4" />
-                        </Button>
-                        {isAdmin && (
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Versão desktop - tabela oculta em mobile */}
+        <div className="hidden lg:block">
+          {documents.length === 0 ? (
+            <div className="text-center py-8 text-gray-600">
+              <FileText className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+              <p>Nenhum documento encontrado</p>
+              <p className="text-sm">Faça o upload de documentos para começar</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Arquivo</TableHead>
+                    <TableHead>Descrição</TableHead>
+                    <TableHead>Tamanho</TableHead>
+                    <TableHead>Enviado por</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {documents.map((doc) => (
+                    <TableRow key={doc.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{getFileIcon(doc.file_type)}</span>
+                          <div>
+                            <p className="font-medium text-sm">{doc.file_name}</p>
+                            <p className="text-xs text-gray-500">{doc.file_type}</p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="max-w-xs">
+                        <p className="text-sm text-gray-600 truncate">
+                          {doc.description || 'Sem descrição'}
+                        </p>
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {formatFileSize(doc.file_size)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2 text-sm">
+                          <User className="w-4 h-4" />
+                          {doc.uploaded_by_admin ? 'Advogado' : 'Cliente'}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4" />
+                          {formatDistanceToNow(new Date(doc.created_at), { 
+                            addSuffix: true, 
+                            locale: ptBR 
+                          })}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => deleteDocument(doc.id, doc.file_path)}
-                            className="text-red-600 hover:text-red-800"
-                            title="Excluir arquivo"
+                            onClick={() => viewFile(doc.file_path, doc.file_name)}
+                            className="text-blue-600 hover:text-blue-800"
+                            title="Visualizar arquivo"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Eye className="w-4 h-4" />
                           </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => downloadFile(doc.file_path, doc.file_name)}
+                            className="text-primary hover:text-primary/80"
+                            title="Baixar arquivo"
+                          >
+                            <Download className="w-4 h-4" />
+                          </Button>
+                          {isAdmin && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => deleteDocument(doc.id, doc.file_path)}
+                              className="text-red-600 hover:text-red-800"
+                              title="Excluir arquivo"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
