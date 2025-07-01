@@ -6,9 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LogOut, Plus, Trash2, Users, Eye, UserPlus, Search, Edit, X } from "lucide-react";
+import { LogOut, Plus, Trash2, Users, Eye, UserPlus, Search, Edit, X, FileText } from "lucide-react";
 import AddProcessForm from "@/components/admin/AddProcessForm";
 import ClientProcessesList from "@/components/admin/ClientProcessesList";
+import ClientDocumentsModal from "@/components/admin/ClientDocumentsModal";
 
 interface Client {
   id: string;
@@ -30,6 +31,7 @@ const AdminPanel = () => {
   const [clientProcesses, setClientProcesses] = useState<{[key: string]: ClientProcess[]}>({});
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAddProcessForm, setShowAddProcessForm] = useState<string | null>(null);
+  const [showDocumentsModal, setShowDocumentsModal] = useState<{clientId: string, clientName: string} | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -508,6 +510,15 @@ const AdminPanel = () => {
                     <TableCell>
                       <div className="flex space-x-2">
                         <Button
+                          onClick={() => setShowDocumentsModal({clientId: client.id, clientName: client.name})}
+                          size="sm"
+                          variant="outline"
+                          className="text-slate-800 hover:text-slate-700 border-slate-800 hover:border-slate-700"
+                          title="Ver documentos"
+                        >
+                          <FileText className="w-4 h-4" />
+                        </Button>
+                        <Button
                           size="sm"
                           variant="outline"
                           className="text-slate-800 hover:text-slate-700 border-slate-800 hover:border-slate-700"
@@ -530,6 +541,16 @@ const AdminPanel = () => {
             </Table>
           </CardContent>
         </Card>
+
+        {/* Modal de Documentos */}
+        {showDocumentsModal && (
+          <ClientDocumentsModal
+            isOpen={true}
+            onClose={() => setShowDocumentsModal(null)}
+            clientId={showDocumentsModal.clientId}
+            clientName={showDocumentsModal.clientName}
+          />
+        )}
       </div>
     </div>
   );

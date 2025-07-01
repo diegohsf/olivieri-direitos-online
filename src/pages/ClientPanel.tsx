@@ -7,6 +7,8 @@ import { LogOut, User, Phone, Mail, Hash } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import ProcessSelector from "@/components/client/ProcessSelector";
 import ProcessDetails from "@/components/client/ProcessDetails";
+import DocumentUpload from "@/components/client/DocumentUpload";
+import DocumentsList from "@/components/client/DocumentsList";
 
 interface Client {
   id: string;
@@ -37,6 +39,7 @@ const ClientPanel = () => {
   const [processData, setProcessData] = useState<any>(null);
   const [movements, setMovements] = useState<ProcessMovement[]>([]);
   const [loading, setLoading] = useState(false);
+  const [documentsRefresh, setDocumentsRefresh] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -275,6 +278,18 @@ const ClientPanel = () => {
             onRefresh={requestUpdate}
           />
         )}
+
+        {/* Seção de Documentos */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <DocumentUpload 
+            clientId={client.id} 
+            onUploadSuccess={() => setDocumentsRefresh(prev => prev + 1)} 
+          />
+          <DocumentsList 
+            clientId={client.id} 
+            refreshTrigger={documentsRefresh} 
+          />
+        </div>
       </div>
     </div>
   );
