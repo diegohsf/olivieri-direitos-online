@@ -29,15 +29,33 @@ serve(async (req) => {
     const processData = await req.json();
     console.log('Received process data:', processData);
 
-    const processNumber = processData.process_number || processData.numero_processo;
+    // Tentar extrair o número do processo de diferentes formas
+    let processNumber = null;
+    
+    // Verificar se existe response_data.code (caso dos dados que você está enviando)
+    if (processData.payload?.response_data?.code) {
+      processNumber = processData.payload.response_data.code;
+    }
+    // Verificar campos alternativos
+    else if (processData.process_number) {
+      processNumber = processData.process_number;
+    }
+    else if (processData.numero_processo) {
+      processNumber = processData.numero_processo;
+    }
+    else if (processData.code) {
+      processNumber = processData.code;
+    }
     
     if (!processNumber) {
-      console.error('Process number is required');
+      console.error('Process number not found in payload:', JSON.stringify(processData, null, 2));
       return new Response('Process number is required', { 
         status: 400, 
         headers: corsHeaders 
       });
     }
+
+    console.log('Extracted process number:', processNumber);
 
     // Check if process already exists
     const { data: existingProcess } = await supabase
@@ -46,15 +64,18 @@ serve(async (req) => {
       .eq('process_number', processNumber)
       .single();
 
+    const dataToStore = {
+      process_number: processNumber,
+      case_data: processData.payload?.response_data || processData,
+      movements: processData.payload?.response_data?.steps || processData.movements || processData.movimentacoes || [],
+      last_updated: new Date().toISOString()
+    };
+
     if (existingProcess) {
       // Update existing process
       const { error: updateError } = await supabase
         .from('process_data')
-        .update({
-          case_data: processData.case_data || processData,
-          movements: processData.movements || processData.movimentacoes || [],
-          last_updated: new Date().toISOString()
-        })
+        .update(dataToStore)
         .eq('process_number', processNumber);
 
       if (updateError) {
@@ -70,12 +91,7 @@ serve(async (req) => {
       // Insert new process
       const { error: insertError } = await supabase
         .from('process_data')
-        .insert({
-          process_number: processNumber,
-          case_data: processData.case_data || processData,
-          movements: processData.movements || processData.movimentacoes || [],
-          last_updated: new Date().toISOString()
-        });
+        .insert(dataToStore);
 
       if (insertError) {
         console.error('Error inserting process:', insertError);
