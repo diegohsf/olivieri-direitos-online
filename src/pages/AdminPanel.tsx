@@ -276,8 +276,8 @@ const AdminPanel = () => {
           <Card className="bg-white">
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <Users className="w-6 h-6 text-blue-600" />
+                <div className="p-3 bg-[#1a237e]/10 rounded-lg">
+                  <Users className="w-6 h-6 text-[#1a237e]" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Total de Clientes</p>
@@ -382,7 +382,7 @@ const AdminPanel = () => {
                       onClick={addNewProcessField}
                       size="sm"
                       variant="outline"
-                      className="text-blue-600 hover:text-blue-800"
+                      className="text-[#1a237e] hover:text-[#283593] border-[#1a237e] hover:border-[#283593]"
                     >
                       <Plus className="w-4 h-4 mr-1" />
                       Adicionar Processo
@@ -495,7 +495,7 @@ const AdminPanel = () => {
                           onClick={() => setShowAddProcessForm(client.id)}
                           size="sm"
                           variant="outline"
-                          className="text-blue-600 hover:text-blue-800"
+                          className="text-[#1a237e] hover:text-[#283593] border-[#1a237e] hover:border-[#283593]"
                         >
                           <Plus className="w-4 h-4 mr-1" />
                           Adicionar Processo
@@ -510,7 +510,7 @@ const AdminPanel = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-blue-600 hover:text-blue-800"
+                          className="text-[#1a237e] hover:text-[#283593] border-[#1a237e] hover:border-[#283593]"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
