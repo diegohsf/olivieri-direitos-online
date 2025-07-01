@@ -73,7 +73,12 @@ export default function ChatWindow({ conversationId, currentUserId, userType, cl
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages(data || []);
+      // Type assertion para garantir que sender_type seja do tipo correto
+      const typedMessages = (data || []).map(msg => ({
+        ...msg,
+        sender_type: msg.sender_type as 'client' | 'admin'
+      }));
+      setMessages(typedMessages);
     } catch (error) {
       console.error('Erro ao buscar mensagens:', error);
       toast({

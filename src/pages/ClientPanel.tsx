@@ -23,6 +23,7 @@ interface Client {
 export default function ClientPanel() {
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshDocuments, setRefreshDocuments] = useState(0);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -65,6 +66,14 @@ export default function ClientPanel() {
     localStorage.removeItem('clientEmail');
     localStorage.removeItem('clientAuth');
     navigate('/login');
+  };
+
+  const handleUploadSuccess = () => {
+    setRefreshDocuments(prev => prev + 1);
+    toast({
+      title: "Sucesso",
+      description: "Documentos enviados com sucesso!",
+    });
   };
 
   if (loading) {
@@ -142,18 +151,15 @@ export default function ClientPanel() {
           </TabsList>
 
           <TabsContent value="processo">
-            <ProcessDetails 
-              processNumber={client.process_number}
-              clientId={client.id}
-            />
+            <ProcessDetails processNumber={client.process_number} />
           </TabsContent>
 
           <TabsContent value="documentos">
-            <DocumentsList clientId={client.id} />
+            <DocumentsList clientId={client.id} key={refreshDocuments} />
           </TabsContent>
 
           <TabsContent value="upload">
-            <DocumentUpload clientId={client.id} />
+            <DocumentUpload clientId={client.id} onUploadSuccess={handleUploadSuccess} />
           </TabsContent>
 
           <TabsContent value="chat">

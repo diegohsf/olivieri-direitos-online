@@ -8,7 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import AddProcessForm from "@/components/admin/AddProcessForm";
-import ClientProcessesList from "@/components/admin/ClientProcessesList";
 import AdminChat from "@/components/chat/AdminChat";
 
 interface Client {
@@ -113,14 +112,10 @@ export default function AdminPanel() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="clientes" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="clientes" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Clientes
-            </TabsTrigger>
-            <TabsTrigger value="processos" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Processos
             </TabsTrigger>
             <TabsTrigger value="chat" className="flex items-center gap-2">
               <MessageCircle className="h-4 w-4" />
@@ -145,7 +140,9 @@ export default function AdminPanel() {
                   </CardHeader>
                   <CardContent>
                     <AddProcessForm 
-                      onSuccess={handleClientAdded}
+                      clientId=""
+                      clientName=""
+                      onProcessAdded={handleClientAdded}
                       onCancel={() => setShowAddForm(false)}
                     />
                   </CardContent>
@@ -192,10 +189,6 @@ export default function AdminPanel() {
                 )}
               </div>
             </div>
-          </TabsContent>
-
-          <TabsContent value="processos">
-            <ClientProcessesList />
           </TabsContent>
 
           <TabsContent value="chat">
