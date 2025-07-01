@@ -63,11 +63,12 @@ const ClientPanel = () => {
         return;
       }
 
-      if (data && data.data) {
+      if (data && data.data && typeof data.data === 'object' && data.data !== null) {
         console.log('Dados do processo encontrados:', data);
         
-        // Extrair dados do processo do campo data (jsonb)
-        const processInfo = data.data.payload?.response_data || data.data;
+        // Extrair dados do processo do campo data (jsonb) com type safety
+        const processInfoData = data.data as any;
+        const processInfo = processInfoData.payload?.response_data || processInfoData;
         setProcessData({ case_data: processInfo });
         
         // Processar movimentações - verificar se existem steps
