@@ -68,27 +68,8 @@ const AdminPanel = () => {
 
   const sendToZapelegante = async (clientData: any) => {
     try {
-      // Enviando dados no formato correto para o n8n
-      const response = await fetch('https://webhook.zapelegante.com.br/webhook/e87de2ba-baa4-4421-a8eb-821e537f9da2', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        mode: 'no-cors',
-        body: JSON.stringify({
-          processNumber: clientData.process_number,
-          clientId: clientData.id,
-          clientName: clientData.name,
-          clientPhone: clientData.phone,
-          clientEmail: clientData.email,
-          clientPassword: clientData.password_hash,
-          requestDate: new Date().toISOString(),
-          webhookUrl: "https://webhook.zapelegante.com.br/webhook/280c16d7-4a8e-43a1-ba0c-80bb831b47ac",
-          executionMode: "production"
-        }),
-      });
-
-      console.log('Dados enviados para Zapelegante:', {
+      // Criar um payload simples com campos separados
+      const payload = {
         processNumber: clientData.process_number,
         clientId: clientData.id,
         clientName: clientData.name,
@@ -98,7 +79,19 @@ const AdminPanel = () => {
         requestDate: new Date().toISOString(),
         webhookUrl: "https://webhook.zapelegante.com.br/webhook/280c16d7-4a8e-43a1-ba0c-80bb831b47ac",
         executionMode: "production"
+      };
+
+      console.log('Enviando payload para Zapelegante:', payload);
+
+      const response = await fetch('https://webhook.zapelegante.com.br/webhook/e87de2ba-baa4-4421-a8eb-821e537f9da2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       });
+
+      console.log('Resposta do webhook:', response.status);
     } catch (error) {
       console.error('Erro ao enviar para Zapelegante:', error);
     }

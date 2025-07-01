@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Lock, Mail, Eye, EyeOff } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -19,32 +20,32 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // Credenciais de demonstração
+      // Credenciais de administrador
       if (email === 'admin@luisolivieri.com.br' && password === 'admin123') {
-        // Login como admin
         localStorage.setItem('adminAuth', 'true');
         toast.success('Login administrativo realizado com sucesso!');
         navigate('/admin');
         return;
       }
       
-      if (email === 'cliente@demo.com' && password === 'demo123') {
-        // Login como cliente
-        const mockClient = {
-          id: '1',
-          name: 'Cliente Demonstração',
-          email: 'cliente@demo.com',
-          phone: '(11) 99999-9999',
-          process_number: '1234567-89.2023.1.00.0001'
-        };
-        
-        localStorage.setItem('clientAuth', JSON.stringify(mockClient));
-        toast.success('Login realizado com sucesso!');
-        navigate('/cliente');
+      // Verificar se é um cliente cadastrado no banco de dados
+      const { data: client, error } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('email', email)
+        .eq('password_hash', password)
+        .single();
+
+      if (error || !client) {
+        toast.error('Credenciais inválidas');
         return;
       }
 
-      toast.error('Credenciais inválidas');
+      // Login como cliente
+      localStorage.setItem('clientAuth', JSON.stringify(client));
+      toast.success('Login realizado com sucesso!');
+      navigate('/cliente');
+
     } catch (error) {
       console.error('Erro no login:', error);
       toast.error('Erro ao fazer login');
@@ -119,7 +120,7 @@ const Login = () => {
             <div className="text-sm text-gray-600 space-y-1">
               <p><strong>Acesso de Demonstração:</strong></p>
               <p><strong>Admin:</strong> admin@luisolivieri.com.br / admin123</p>
-              <p><strong>Cliente:</strong> cliente@demo.com / demo123</p>
+              <p><strong>Cliente:</strong> Use as credenciais fornecidas pelo administrador</p>
             </div>
           </div>
         </CardContent>
