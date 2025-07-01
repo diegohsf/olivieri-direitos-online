@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { LogOut, Plus, Trash2, Users, Eye, UserPlus, Search, Edit, X, FileText } from "lucide-react";
 import AddProcessForm from "@/components/admin/AddProcessForm";
 import ClientProcessesList from "@/components/admin/ClientProcessesList";
-import ClientDocumentsModal from "@/components/admin/ClientDocumentsModal";
+
 
 interface Client {
   id: string;
@@ -31,7 +31,7 @@ const AdminPanel = () => {
   const [clientProcesses, setClientProcesses] = useState<{[key: string]: ClientProcess[]}>({});
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAddProcessForm, setShowAddProcessForm] = useState<string | null>(null);
-  const [showDocumentsModal, setShowDocumentsModal] = useState<{clientId: string, clientName: string} | null>(null);
+  
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -510,7 +510,7 @@ const AdminPanel = () => {
                     <TableCell>
                       <div className="flex space-x-2">
                         <Button
-                          onClick={() => setShowDocumentsModal({clientId: client.id, clientName: client.name})}
+                          onClick={() => navigate(`/cliente/${client.id}/documentos`)}
                           size="sm"
                           variant="outline"
                           className="text-slate-800 hover:text-slate-700 border-slate-800 hover:border-slate-700"
@@ -542,15 +542,6 @@ const AdminPanel = () => {
           </CardContent>
         </Card>
 
-        {/* Modal de Documentos */}
-        {showDocumentsModal && (
-          <ClientDocumentsModal
-            isOpen={true}
-            onClose={() => setShowDocumentsModal(null)}
-            clientId={showDocumentsModal.clientId}
-            clientName={showDocumentsModal.clientName}
-          />
-        )}
       </div>
     </div>
   );

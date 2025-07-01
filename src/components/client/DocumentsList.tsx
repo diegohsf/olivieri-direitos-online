@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { FileText, Download, Calendar, User, Trash2 } from "lucide-react";
+import { FileText, Download, Calendar, User, Trash2, Eye } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -72,6 +72,24 @@ const DocumentsList = ({ clientId, isAdmin = false, refreshTrigger }: DocumentsL
     } catch (error) {
       console.error('Erro no download:', error);
       toast.error('Erro ao baixar arquivo');
+    }
+  };
+
+  const viewFile = async (filePath: string, fileName: string) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('client-documents')
+        .createSignedUrl(filePath, 3600); // URL válida por 1 hora
+
+      if (error) throw error;
+
+      if (data.signedUrl) {
+        window.open(data.signedUrl, '_blank');
+        toast.success('Arquivo aberto em nova aba!');
+      }
+    } catch (error) {
+      console.error('Erro ao visualizar arquivo:', error);
+      toast.error('Erro ao abrir arquivo');
     }
   };
 
@@ -195,8 +213,18 @@ const DocumentsList = ({ clientId, isAdmin = false, refreshTrigger }: DocumentsL
                         <Button
                           size="sm"
                           variant="outline"
+                          onClick={() => viewFile(doc.file_path, doc.file_name)}
+                          className="text-blue-600 hover:text-blue-800"
+                          title="Visualizar arquivo"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
                           onClick={() => downloadFile(doc.file_path, doc.file_name)}
                           className="text-primary hover:text-primary/80"
+                          title="Baixar arquivo"
                         >
                           <Download className="w-4 h-4" />
                         </Button>
@@ -206,6 +234,7 @@ const DocumentsList = ({ clientId, isAdmin = false, refreshTrigger }: DocumentsL
                             variant="outline"
                             onClick={() => deleteDocument(doc.id, doc.file_path)}
                             className="text-red-600 hover:text-red-800"
+                            title="Excluir arquivo"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>

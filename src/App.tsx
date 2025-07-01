@@ -12,6 +12,7 @@ import Contato from "./pages/Contato";
 import Login from "./pages/Login";
 import AdminPanel from "./pages/AdminPanel";
 import ClientPanel from "./pages/ClientPanel";
+import ClientDocuments from "./pages/ClientDocuments";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/cliente" element={<ClientPanel />} />
+          <Route path="/cliente/:clientId/documentos" element={<ClientDocuments />} />
           {/* Redirecionar rotas antigas para a nova página de login */}
           <Route path="/admin-login" element={<Login />} />
           <Route path="/cliente-login" element={<Login />} />
