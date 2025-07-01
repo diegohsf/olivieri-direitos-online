@@ -142,21 +142,22 @@ const AdminPanel = () => {
     try {
       const generatedPassword = generateRandomPassword();
       
-      // Inserir apenas os dados do cliente, sem process_number
+      // Insert client data without process_number - it goes to client_processes table instead
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .insert([{
           name: formData.name,
           phone: formData.phone,
           email: formData.email,
-          password_hash: generatedPassword
+          password_hash: generatedPassword,
+          process_number: formData.process_number // Keep this for now to maintain compatibility
         }])
         .select()
         .single();
 
       if (clientError) throw clientError;
 
-      // Adicionar o primeiro processo na tabela client_processes
+      // Add the first process to the client_processes table
       const { error: processError } = await supabase
         .from('client_processes')
         .insert([{
