@@ -15,6 +15,7 @@ interface Client {
   email: string;
   process_number: string;
   created_at: string;
+  password_hash: string;
 }
 
 const AdminPanel = () => {
@@ -24,7 +25,6 @@ const AdminPanel = () => {
     name: '',
     phone: '',
     email: '',
-    password: '',
     process_number: ''
   });
   const [searchTerm, setSearchTerm] = useState('');
@@ -56,27 +56,49 @@ const AdminPanel = () => {
     }
   };
 
+  const generateRandomPassword = () => {
+    const length = 8;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    return password;
+  };
+
   const sendToZapelegante = async (clientData: any) => {
     try {
-      const webhookData = {
-        processNumber: clientData.process_number,
-        clientId: clientData.id,
-        clientName: clientData.name,
-        requestDate: new Date().toISOString(),
-        webhookUrl: "https://webhook.zapelegante.com.br/webhook/280c16d7-4a8e-43a1-ba0c-80bb831b47ac",
-        executionMode: "production"
-      };
-
+      // Enviando dados no formato correto para o n8n
       const response = await fetch('https://webhook.zapelegante.com.br/webhook/e87de2ba-baa4-4421-a8eb-821e537f9da2', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         mode: 'no-cors',
-        body: JSON.stringify(webhookData),
+        body: JSON.stringify({
+          processNumber: clientData.process_number,
+          clientId: clientData.id,
+          clientName: clientData.name,
+          clientPhone: clientData.phone,
+          clientEmail: clientData.email,
+          clientPassword: clientData.password_hash,
+          requestDate: new Date().toISOString(),
+          webhookUrl: "https://webhook.zapelegante.com.br/webhook/280c16d7-4a8e-43a1-ba0c-80bb831b47ac",
+          executionMode: "production"
+        }),
       });
 
-      console.log('Dados enviados para Zapelegante:', webhookData);
+      console.log('Dados enviados para Zapelegante:', {
+        processNumber: clientData.process_number,
+        clientId: clientData.id,
+        clientName: clientData.name,
+        clientPhone: clientData.phone,
+        clientEmail: clientData.email,
+        clientPassword: clientData.password_hash,
+        requestDate: new Date().toISOString(),
+        webhookUrl: "https://webhook.zapelegante.com.br/webhook/280c16d7-4a8e-43a1-ba0c-80bb831b47ac",
+        executionMode: "production"
+      });
     } catch (error) {
       console.error('Erro ao enviar para Zapelegante:', error);
     }
@@ -87,13 +109,16 @@ const AdminPanel = () => {
     setLoading(true);
 
     try {
+      // Gerar senha automaticamente
+      const generatedPassword = generateRandomPassword();
+      
       const { data, error } = await supabase
         .from('clients')
         .insert([{
           name: formData.name,
           phone: formData.phone,
           email: formData.email,
-          password_hash: formData.password,
+          password_hash: generatedPassword, // Usando a senha gerada
           process_number: formData.process_number
         }])
         .select()
@@ -102,13 +127,17 @@ const AdminPanel = () => {
       if (error) throw error;
 
       // Enviar dados para o webhook do Zapelegante
-      await sendToZapelegante(data);
+      await sendToZapelegante({
+        ...data,
+        password_hash: generatedPassword // Garantir que a senha gerada seja enviada
+      });
 
-      toast.success('Cliente adicionado com sucesso!');
-      setFormData({ name: '', phone: '', email: '', password: '', process_number: '' });
+      toast.success(`Cliente adicionado com sucesso! Senha gerada: ${generatedPassword}`);
+      setFormData({ name: '', phone: '', email: '', process_number: '' });
       setShowAddForm(false);
       fetchClients();
     } catch (error) {
+      console.error('Erro detalhado:', error);
       toast.error('Erro ao adicionar cliente');
     } finally {
       setLoading(false);
@@ -182,7 +211,7 @@ const AdminPanel = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Total de Clientes</p>
-                  <p className="text-2xl font-bold text-gray-800">{totalClients}</p>
+                  <p className="text-2xl font-bold text-gray-800">{clients.length}</p>
                 </div>
               </div>
             </CardContent>
@@ -210,7 +239,11 @@ const AdminPanel = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Novos Este Mês</p>
-                  <p className="text-2xl font-bold text-gray-800">{newThisMonth}</p>
+                  <p className="text-2xl font-bold text-gray-800">{clients.filter(client => {
+                    const created = new Date(client.created_at);
+                    const now = new Date();
+                    return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
+                  }).length}</p>
                 </div>
               </div>
             </CardContent>
@@ -265,19 +298,17 @@ const AdminPanel = () => {
                   required
                 />
                 <Input
-                  type="password"
-                  placeholder="Senha"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
-                />
-                <Input
                   placeholder="Número do Processo CNJ"
                   value={formData.process_number}
                   onChange={(e) => setFormData({ ...formData, process_number: e.target.value })}
                   required
                   className="md:col-span-2"
                 />
+                <div className="md:col-span-2">
+                  <p className="text-sm text-gray-600 mb-2">
+                    ℹ️ A senha será gerada automaticamente e exibida após o cadastro
+                  </p>
+                </div>
                 <div className="md:col-span-2 flex gap-2">
                   <Button
                     type="submit"
@@ -314,7 +345,11 @@ const AdminPanel = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredClients.map((client) => (
+                {clients.filter(client =>
+                  client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  client.process_number.toLowerCase().includes(searchTerm.toLowerCase())
+                ).map((client) => (
                   <TableRow key={client.id} className="hover:bg-gray-50">
                     <TableCell>
                       <div>
@@ -334,7 +369,7 @@ const AdminPanel = () => {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-gray-600">f2pfumal</span>
+                      <span className="text-sm text-gray-600">{client.password_hash}</span>
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-gray-500">Nunca</span>
