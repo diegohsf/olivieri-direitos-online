@@ -43,6 +43,12 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
     initializeConversation();
   }, [clientId]);
 
+  // Validar se é um UUID válido
+  const isValidUUID = (uuid: string) => {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(uuid);
+  };
+
   const initializeConversation = async () => {
     try {
       console.log('Inicializando conversa para clientId:', clientId);
@@ -138,6 +144,13 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
 
   const sendMessage = async () => {
     if (!newMessage.trim() || !conversationId || loading) return;
+
+    // Validar currentUserId
+    if (!isValidUUID(currentUserId)) {
+      console.error('UUID inválido para currentUserId:', currentUserId);
+      toast.error('Erro: ID de usuário inválido');
+      return;
+    }
 
     setLoading(true);
     try {

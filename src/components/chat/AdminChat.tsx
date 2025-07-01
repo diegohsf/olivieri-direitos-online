@@ -10,7 +10,7 @@ interface AdminChatProps {
 
 const AdminChat = ({ clientId, clientName, adminId }: AdminChatProps) => {
   // Gerar um UUID válido para o admin se não fornecido
-  const validAdminId = adminId || '00000000-0000-0000-0000-000000000001';
+  const validAdminId = adminId || crypto.randomUUID();
   
   return (
     <div className="w-full">
