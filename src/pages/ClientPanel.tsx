@@ -66,16 +66,20 @@ const ClientPanel = () => {
         console.log('Dados do processo encontrados:', data);
         setProcessData(data);
         
-        // Processar movimentações dos dados reais
-        const processMovements = data.movements || [];
-        const formattedMovements = processMovements.map((movement: any) => ({
-          date: movement.step_date || movement.date || new Date().toISOString(),
-          description: movement.content || movement.description || 'Movimentação',
-          type: movement.type || 'Movimento',
-          content: movement.content
-        }));
-        
-        setMovements(formattedMovements);
+        // Processar movimentações dos dados reais - verificar se é array
+        const processMovements = data.movements;
+        if (Array.isArray(processMovements)) {
+          const formattedMovements = processMovements.map((movement: any) => ({
+            date: movement.step_date || movement.date || new Date().toISOString(),
+            description: movement.content || movement.description || 'Movimentação',
+            type: movement.type || 'Movimento',
+            content: movement.content
+          }));
+          setMovements(formattedMovements);
+        } else {
+          // Se movements não for array, usar array vazio
+          setMovements([]);
+        }
       } else {
         setMockData(processNumber);
       }
