@@ -18,11 +18,51 @@ const AddProcessForm = ({ clientId, clientName, onProcessAdded, onCancel }: AddP
   const [processNumber, setProcessNumber] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const sendToZapelegante = async (clientData: any, processNumber: string) => {
+    try {
+      const payload = {
+        processNumber: processNumber,
+        clientId: clientData.id,
+        clientName: clientData.name,
+        clientPhone: clientData.phone,
+        clientEmail: clientData.email,
+        clientPassword: clientData.password_hash,
+        requestDate: new Date().toISOString(),
+        webhookUrl: "https://webhook.zapelegante.com.br/webhook/280c16d7-4a8e-43a1-ba0c-80bb831b47ac",
+        executionMode: "production"
+      };
+
+      console.log('Enviando payload para Zapelegante (processo adicional):', payload);
+
+      const response = await fetch('https://webhook.zapelegante.com.br/webhook/e87de2ba-baa4-4421-a8eb-821e537f9da2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      console.log('Resposta do webhook (processo adicional):', response.status);
+    } catch (error) {
+      console.error('Erro ao enviar para Zapelegante (processo adicional):', error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // Buscar dados completos do cliente
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('id', clientId)
+        .single();
+
+      if (clientError) throw clientError;
+
+      // Adicionar o novo processo
       const { error } = await supabase
         .from('client_processes')
         .insert([{
@@ -38,6 +78,9 @@ const AddProcessForm = ({ clientId, clientName, onProcessAdded, onCancel }: AddP
         }
         return;
       }
+
+      // Enviar dados para o webhook
+      await sendToZapelegante(clientData, processNumber);
 
       toast.success('Processo adicionado com sucesso!');
       setProcessNumber('');
