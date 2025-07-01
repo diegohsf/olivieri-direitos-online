@@ -9,9 +9,8 @@ import Sobre from "./pages/Sobre";
 import Especialidades from "./pages/Especialidades";
 import Depoimentos from "./pages/Depoimentos";
 import Contato from "./pages/Contato";
-import AdminLogin from "./pages/AdminLogin";
+import Login from "./pages/Login";
 import AdminPanel from "./pages/AdminPanel";
-import ClientLogin from "./pages/ClientLogin";
 import ClientPanel from "./pages/ClientPanel";
 import NotFound from "./pages/NotFound";
 
@@ -29,10 +28,12 @@ const App = () => (
           <Route path="/especialidades" element={<Especialidades />} />
           <Route path="/depoimentos" element={<Depoimentos />} />
           <Route path="/contato" element={<Contato />} />
-          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/cliente-login" element={<ClientLogin />} />
           <Route path="/cliente" element={<ClientPanel />} />
+          {/* Redirecionar rotas antigas para a nova página de login */}
+          <Route path="/admin-login" element={<Login />} />
+          <Route path="/cliente-login" element={<Login />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
