@@ -24,6 +24,9 @@ export default function ClientPanel() {
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshDocuments, setRefreshDocuments] = useState(0);
+  const [processData, setProcessData] = useState<any>(null);
+  const [movements, setMovements] = useState<any[]>([]);
+  const [processLoading, setProcessLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -49,6 +52,11 @@ export default function ClientPanel() {
 
       if (error) throw error;
       setClient(data);
+      
+      // Buscar dados do processo
+      if (data.process_number) {
+        await fetchProcessData(data.process_number);
+      }
     } catch (error) {
       console.error('Erro ao verificar autenticação:', error);
       toast({
@@ -59,6 +67,34 @@ export default function ClientPanel() {
       navigate('/login');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchProcessData = async (processNumber: string) => {
+    setProcessLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('process_data')
+        .select('*')
+        .eq('process_number', processNumber)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      
+      if (data) {
+        setProcessData(data.case_data);
+        setMovements(data.movements || []);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar dados do processo:', error);
+    } finally {
+      setProcessLoading(false);
+    }
+  };
+
+  const handleRefreshProcess = () => {
+    if (client?.process_number) {
+      fetchProcessData(client.process_number);
     }
   };
 
@@ -151,7 +187,13 @@ export default function ClientPanel() {
           </TabsList>
 
           <TabsContent value="processo">
-            <ProcessDetails processNumber={client.process_number} />
+            <ProcessDetails 
+              processNumber={client.process_number}
+              processData={processData}
+              movements={movements}
+              loading={processLoading}
+              onRefresh={handleRefreshProcess}
+            />
           </TabsContent>
 
           <TabsContent value="documentos">

@@ -3,11 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, FileText, Settings, Plus, MessageCircle, ExternalLink } from "lucide-react";
+import { Users, MessageCircle, Settings, Plus, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import AddProcessForm from "@/components/admin/AddProcessForm";
 import AdminChat from "@/components/chat/AdminChat";
 
 interface Client {
@@ -22,7 +21,6 @@ interface Client {
 export default function AdminPanel() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAddForm, setShowAddForm] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -63,15 +61,6 @@ export default function AdminPanel() {
   const handleLogout = () => {
     localStorage.removeItem('adminAuth');
     navigate('/login');
-  };
-
-  const handleClientAdded = () => {
-    setShowAddForm(false);
-    fetchClients();
-    toast({
-      title: "Sucesso",
-      description: "Cliente adicionado com sucesso!",
-    });
   };
 
   const handleViewDocuments = (clientId: string) => {
@@ -127,27 +116,7 @@ export default function AdminPanel() {
             <div className="space-y-6">
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-gray-900">Clientes Cadastrados</h2>
-                <Button onClick={() => setShowAddForm(true)} className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Adicionar Cliente
-                </Button>
               </div>
-
-              {showAddForm && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Adicionar Novo Cliente</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <AddProcessForm 
-                      clientId=""
-                      clientName=""
-                      onProcessAdded={handleClientAdded}
-                      onCancel={() => setShowAddForm(false)}
-                    />
-                  </CardContent>
-                </Card>
-              )}
 
               <div className="grid gap-6">
                 {clients.length === 0 ? (
