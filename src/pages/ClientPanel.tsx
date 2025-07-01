@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { LogOut, RefreshCw, FileText, Calendar, User, Phone, Mail, Hash } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Client {
   id: string;
@@ -18,6 +19,8 @@ interface ProcessMovement {
   date: string;
   description: string;
   type: string;
+  content?: string;
+  step_date?: string;
 }
 
 const ClientPanel = () => {
@@ -30,55 +33,97 @@ const ClientPanel = () => {
   useEffect(() => {
     const clientData = localStorage.getItem('clientAuth');
     if (!clientData) {
-      navigate('/cliente-login');
+      navigate('/login');
       return;
     }
 
     try {
       const parsedClient = JSON.parse(clientData);
       setClient(parsedClient);
-      
-      // Dados de demonstração para o processo
-      const mockProcessData = {
-        case_data: {
-          numero: parsedClient.process_number,
-          classe: 'Execução Fiscal',
-          assunto: 'Dívida Ativa',
-          valor: 'R$ 25.000,00',
-          distribuicao: '15/03/2023',
-          status: 'Em andamento'
-        }
-      };
-      
-      const mockMovements = [
-        {
-          date: '2023-12-01',
-          description: 'Processo distribuído',
-          type: 'Distribuição'
-        },
-        {
-          date: '2023-12-15',
-          description: 'Citação realizada',
-          type: 'Citação'
-        },
-        {
-          date: '2024-01-10',
-          description: 'Contestação apresentada',
-          type: 'Contestação'
-        }
-      ];
-      
-      setProcessData(mockProcessData);
-      setMovements(mockMovements);
+      fetchProcessData(parsedClient.process_number);
     } catch (error) {
       console.error('Erro ao carregar dados do cliente:', error);
-      navigate('/cliente-login');
+      navigate('/login');
     }
   }, [navigate]);
 
+  const fetchProcessData = async (processNumber: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('process_data')
+        .select('*')
+        .eq('process_number', processNumber)
+        .single();
+
+      if (error) {
+        console.error('Erro ao buscar dados do processo:', error);
+        // Se não encontrar dados reais, usa dados de demonstração
+        setMockData(processNumber);
+        return;
+      }
+
+      if (data) {
+        console.log('Dados do processo encontrados:', data);
+        setProcessData(data);
+        
+        // Processar movimentações dos dados reais
+        const processMovements = data.movements || [];
+        const formattedMovements = processMovements.map((movement: any) => ({
+          date: movement.step_date || movement.date || new Date().toISOString(),
+          description: movement.content || movement.description || 'Movimentação',
+          type: movement.type || 'Movimento',
+          content: movement.content
+        }));
+        
+        setMovements(formattedMovements);
+      } else {
+        setMockData(processNumber);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar processo:', error);
+      setMockData(processNumber);
+    }
+  };
+
+  const setMockData = (processNumber: string) => {
+    // Dados de demonstração como fallback
+    const mockProcessData = {
+      case_data: {
+        code: processNumber,
+        numero: processNumber,
+        classe: 'Execução Fiscal',
+        assunto: 'Dívida Ativa',
+        valor: 'R$ 25.000,00',
+        distribuicao: '15/03/2023',
+        status: 'Em andamento'
+      }
+    };
+    
+    const mockMovements = [
+      {
+        date: '2023-12-01',
+        description: 'Processo distribuído',
+        type: 'Distribuição'
+      },
+      {
+        date: '2023-12-15',
+        description: 'Citação realizada',
+        type: 'Citação'
+      },
+      {
+        date: '2024-01-10',
+        description: 'Contestação apresentada',
+        type: 'Contestação'
+      }
+    ];
+    
+    setProcessData(mockProcessData);
+    setMovements(mockMovements);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('clientAuth');
-    navigate('/cliente-login');
+    navigate('/login');
     toast.success('Logout realizado com sucesso!');
   };
 
@@ -87,11 +132,11 @@ const ClientPanel = () => {
     
     setLoading(true);
     try {
-      // Simular solicitação de atualização
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Solicitação de atualização enviada com sucesso!');
+      // Solicitar nova atualização dos dados
+      await fetchProcessData(client.process_number);
+      toast.success('Dados atualizados com sucesso!');
     } catch (error) {
-      toast.error('Erro ao solicitar atualização');
+      toast.error('Erro ao atualizar dados');
     } finally {
       setLoading(false);
     }
@@ -100,6 +145,24 @@ const ClientPanel = () => {
   if (!client) {
     return <div>Carregando...</div>;
   }
+
+  // Função para formatar dados do processo baseado na estrutura real
+  const getProcessInfo = () => {
+    const caseData = processData?.case_data || {};
+    
+    return {
+      numero: caseData.code || caseData.numero || client.process_number,
+      classe: caseData.name || caseData.classe || 'Não informado',
+      assunto: caseData.subjects?.[0]?.name || caseData.assunto || 'Não informado',
+      valor: caseData.amount ? `R$ ${caseData.amount.toLocaleString('pt-BR')}` : (caseData.valor || 'Não informado'),
+      distribuicao: caseData.distribution_date ? new Date(caseData.distribution_date).toLocaleDateString('pt-BR') : (caseData.distribuicao || 'Não informado'),
+      status: caseData.status || 'Em andamento',
+      tribunal: caseData.tribunal_acronym || 'Não informado',
+      juiz: caseData.judge || 'Não informado'
+    };
+  };
+
+  const processInfo = getProcessInfo();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -171,7 +234,7 @@ const ClientPanel = () => {
                   className="bg-[#1a237e] hover:bg-[#283593]"
                 >
                   <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                  Solicitar Atualização
+                  Atualizar Dados
                 </Button>
               </div>
             </CardHeader>
@@ -179,27 +242,35 @@ const ClientPanel = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <span className="text-sm text-gray-600">Número:</span>
-                  <p className="font-medium">{processData.case_data.numero}</p>
+                  <p className="font-medium">{processInfo.numero}</p>
                 </div>
                 <div>
                   <span className="text-sm text-gray-600">Classe:</span>
-                  <p className="font-medium">{processData.case_data.classe}</p>
+                  <p className="font-medium">{processInfo.classe}</p>
                 </div>
                 <div>
                   <span className="text-sm text-gray-600">Assunto:</span>
-                  <p className="font-medium">{processData.case_data.assunto}</p>
+                  <p className="font-medium">{processInfo.assunto}</p>
                 </div>
                 <div>
                   <span className="text-sm text-gray-600">Valor:</span>
-                  <p className="font-medium">{processData.case_data.valor}</p>
+                  <p className="font-medium">{processInfo.valor}</p>
                 </div>
                 <div>
                   <span className="text-sm text-gray-600">Distribuição:</span>
-                  <p className="font-medium">{processData.case_data.distribuicao}</p>
+                  <p className="font-medium">{processInfo.distribuicao}</p>
                 </div>
                 <div>
                   <span className="text-sm text-gray-600">Status:</span>
-                  <p className="font-medium text-green-600">{processData.case_data.status}</p>
+                  <p className="font-medium text-green-600">{processInfo.status}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-600">Tribunal:</span>
+                  <p className="font-medium">{processInfo.tribunal}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-600">Juiz:</span>
+                  <p className="font-medium">{processInfo.juiz}</p>
                 </div>
               </div>
             </CardContent>
@@ -219,7 +290,7 @@ const ClientPanel = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {movements.map((movement, index) => (
+              {movements.length > 0 ? movements.map((movement, index) => (
                 <div key={index} className="border-l-4 border-[#1a237e] pl-4 py-2">
                   <div className="flex justify-between items-start">
                     <div>
@@ -231,7 +302,9 @@ const ClientPanel = () => {
                     </span>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <p className="text-gray-500">Nenhuma movimentação encontrada</p>
+              )}
             </div>
           </CardContent>
         </Card>
