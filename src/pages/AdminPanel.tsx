@@ -6,10 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LogOut, Plus, Trash2, Users, Eye, UserPlus, Search, Edit, X, FileText } from "lucide-react";
+import { LogOut, Plus, Trash2, Users, Eye, UserPlus, Search, Edit, X, FileText, MessageCircle } from "lucide-react";
 import AddProcessForm from "@/components/admin/AddProcessForm";
 import ClientProcessesList from "@/components/admin/ClientProcessesList";
-
 
 interface Client {
   id: string;
@@ -509,6 +508,15 @@ const AdminPanel = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
+                        <Button
+                          onClick={() => navigate(`/client-details/${client.id}`)}
+                          size="sm"
+                          variant="outline"
+                          className="text-blue-600 hover:text-blue-800 border-blue-600 hover:border-blue-800"
+                          title="Ver detalhes e chat"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                        </Button>
                         <Button
                           onClick={() => navigate(`/cliente/${client.id}/documentos`)}
                           size="sm"

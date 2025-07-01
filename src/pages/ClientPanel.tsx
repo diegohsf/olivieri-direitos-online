@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { LogOut, User, Phone, Mail, Hash } from "lucide-react";
+import { LogOut, User, Phone, Mail, Hash, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import ProcessSelector from "@/components/client/ProcessSelector";
 import ProcessDetails from "@/components/client/ProcessDetails";
 import DocumentUpload from "@/components/client/DocumentUpload";
 import DocumentsList from "@/components/client/DocumentsList";
+import ClientChat from "@/components/chat/ClientChat";
 
 interface Client {
   id: string;
@@ -40,6 +41,7 @@ const ClientPanel = () => {
   const [movements, setMovements] = useState<ProcessMovement[]>([]);
   const [loading, setLoading] = useState(false);
   const [documentsRefresh, setDocumentsRefresh] = useState(0);
+  const [activeTab, setActiveTab] = useState<'processes' | 'chat' | 'documents'>('processes');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -261,35 +263,90 @@ const ClientPanel = () => {
           </CardContent>
         </Card>
 
-        {/* Seletor de Processos */}
-        <ProcessSelector
-          processes={clientProcesses}
-          selectedProcessId={selectedProcessId}
-          onProcessSelect={handleProcessSelect}
-        />
+        {/* Tabs */}
+        <div className="mb-6">
+          <div className="border-b border-gray-200 bg-white rounded-t-lg">
+            <nav className="-mb-px flex space-x-8 px-6">
+              <button
+                onClick={() => setActiveTab('processes')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'processes'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <Hash className="w-4 h-4 inline mr-2" />
+                Processos
+              </button>
+              <button
+                onClick={() => setActiveTab('chat')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'chat'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <MessageCircle className="w-4 h-4 inline mr-2" />
+                Chat com Advogado
+              </button>
+              <button
+                onClick={() => setActiveTab('documents')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'documents'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Documentos
+              </button>
+            </nav>
+          </div>
+        </div>
 
-        {/* Detalhes do Processo */}
-        {selectedProcessId && selectedProcessNumber && (
-          <ProcessDetails
-            processNumber={selectedProcessNumber}
-            processData={processData}
-            movements={movements}
-            loading={loading}
-            onRefresh={requestUpdate}
-          />
+        {/* Content */}
+        {activeTab === 'processes' && (
+          <div className="space-y-8">
+            {/* Seletor de Processos */}
+            <ProcessSelector
+              processes={clientProcesses}
+              selectedProcessId={selectedProcessId}
+              onProcessSelect={handleProcessSelect}
+            />
+
+            {/* Detalhes do Processo */}
+            {selectedProcessId && selectedProcessNumber && (
+              <ProcessDetails
+                processNumber={selectedProcessNumber}
+                processData={processData}
+                movements={movements}
+                loading={loading}
+                onRefresh={requestUpdate}
+              />
+            )}
+          </div>
         )}
 
-        {/* Seção de Documentos */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <DocumentUpload 
-            clientId={client.id} 
-            onUploadSuccess={() => setDocumentsRefresh(prev => prev + 1)} 
-          />
-          <DocumentsList 
-            clientId={client.id} 
-            refreshTrigger={documentsRefresh} 
-          />
-        </div>
+        {activeTab === 'chat' && (
+          <div className="max-w-4xl mx-auto">
+            <ClientChat
+              clientId={client.id}
+              clientName={client.name}
+            />
+          </div>
+        )}
+
+        {activeTab === 'documents' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <DocumentUpload 
+              clientId={client.id} 
+              onUploadSuccess={() => setDocumentsRefresh(prev => prev + 1)} 
+            />
+            <DocumentsList 
+              clientId={client.id} 
+              refreshTrigger={documentsRefresh} 
+            />
+          </div>
+        )}
       </div>
     </div>
   );
