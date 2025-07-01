@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -141,6 +142,7 @@ const AdminPanel = () => {
     try {
       const generatedPassword = generateRandomPassword();
       
+      // Inserir apenas os dados do cliente, sem process_number
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .insert([{
@@ -154,7 +156,7 @@ const AdminPanel = () => {
 
       if (clientError) throw clientError;
 
-      // Adicionar o primeiro processo
+      // Adicionar o primeiro processo na tabela client_processes
       const { error: processError } = await supabase
         .from('client_processes')
         .insert([{
