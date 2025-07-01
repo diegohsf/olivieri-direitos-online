@@ -5,17 +5,20 @@ import ChatWindow from './ChatWindow';
 interface AdminChatProps {
   clientId: string;
   clientName: string;
-  adminId: string;
+  adminId?: string;
 }
 
 const AdminChat = ({ clientId, clientName, adminId }: AdminChatProps) => {
+  // Gerar um UUID válido para o admin se não fornecido
+  const validAdminId = adminId || 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
+  
   return (
     <div className="w-full">
       <ChatWindow
         clientId={clientId}
         clientName={clientName}
         isAdmin={true}
-        currentUserId={adminId}
+        currentUserId={validAdminId}
       />
     </div>
   );
