@@ -47,13 +47,13 @@ const ClientLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1a237e] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-primary flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-white">
         <CardHeader className="text-center pb-8">
-          <div className="w-16 h-16 bg-[#1a237e] rounded-full flex items-center justify-center mx-auto mb-4">
-            <Lock className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-8 h-8 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl font-bold text-[#1a237e]">
+          <CardTitle className="text-2xl font-bold text-primary">
             Área Restrita
           </CardTitle>
           <CardDescription className="text-gray-600">
@@ -72,7 +72,7 @@ const ClientLogin = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="pl-10 h-12 border-gray-300 focus:border-[#1a237e]"
+                  className="pl-10 h-12 border-gray-300 focus:border-primary"
                 />
               </div>
             </div>
@@ -87,7 +87,7 @@ const ClientLogin = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="pl-10 pr-10 h-12 border-gray-300 focus:border-[#1a237e]"
+                  className="pl-10 pr-10 h-12 border-gray-300 focus:border-primary"
                 />
                 <button
                   type="button"
@@ -101,7 +101,7 @@ const ClientLogin = () => {
             
             <Button
               type="submit"
-              className="w-full h-12 bg-[#1a237e] text-white hover:bg-[#283593] font-medium"
+              className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
               disabled={loading}
             >
               {loading ? 'Entrando...' : 'Entrar'}
