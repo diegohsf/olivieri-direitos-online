@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,17 +24,21 @@ const DocumentUpload = ({ clientId, onUploadSuccess }: DocumentUploadProps) => {
 
   const triggerWebhook = async (documentRecord: any) => {
     try {
+      console.log('Triggering webhook for record:', documentRecord);
       const { error } = await supabase.functions.invoke('document-upload-webhook', {
         body: { record: documentRecord }
       });
       
       if (error) {
         console.error('Webhook error:', error);
+        toast.error('Arquivo enviado, mas houve erro no webhook de notificação');
       } else {
         console.log('Webhook triggered successfully');
+        toast.success('Arquivo enviado e notificação enviada com sucesso!');
       }
     } catch (error) {
       console.error('Error triggering webhook:', error);
+      toast.error('Arquivo enviado, mas houve erro no webhook de notificação');
     }
   };
 
@@ -48,15 +53,21 @@ const DocumentUpload = ({ clientId, onUploadSuccess }: DocumentUploadProps) => {
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const fileExt = file.name.split('.').pop();
         const fileName = `${clientId}/${Date.now()}-${file.name}`;
+
+        console.log('Uploading file:', file.name);
 
         // Upload do arquivo para o storage
         const { error: uploadError } = await supabase.storage
           .from('client-documents')
           .upload(fileName, file);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          throw uploadError;
+        }
+
+        console.log('File uploaded successfully, registering in database...');
 
         // Registrar o documento na tabela
         const { data: documentRecord, error: dbError } = await supabase
@@ -73,16 +84,25 @@ const DocumentUpload = ({ clientId, onUploadSuccess }: DocumentUploadProps) => {
           .select()
           .single();
 
-        if (dbError) throw dbError;
+        if (dbError) {
+          console.error('Database error:', dbError);
+          throw dbError;
+        }
+
+        console.log('Document registered in database:', documentRecord);
 
         // Disparar webhook
         await triggerWebhook(documentRecord);
       }
 
-      toast.success(`${files.length} arquivo(s) enviado(s) com sucesso!`);
       setFiles(null);
       setDescription('');
       onUploadSuccess();
+      
+      // Limpar o input
+      const fileInput = document.getElementById('file-input') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+
     } catch (error) {
       console.error('Erro no upload:', error);
       toast.error('Erro ao enviar arquivo(s)');

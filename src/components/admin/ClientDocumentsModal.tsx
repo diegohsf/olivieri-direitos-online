@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -28,17 +29,21 @@ const ClientDocumentsModal = ({ isOpen, onClose, clientId, clientName }: ClientD
 
   const triggerWebhook = async (documentRecord: any) => {
     try {
+      console.log('Triggering webhook for record:', documentRecord);
       const { error } = await supabase.functions.invoke('document-upload-webhook', {
         body: { record: documentRecord }
       });
       
       if (error) {
         console.error('Webhook error:', error);
+        toast.error('Arquivo enviado, mas houve erro no webhook de notificação');
       } else {
         console.log('Webhook triggered successfully');
+        toast.success('Arquivo enviado e notificação enviada com sucesso!');
       }
     } catch (error) {
       console.error('Error triggering webhook:', error);
+      toast.error('Arquivo enviado, mas houve erro no webhook de notificação');
     }
   };
 
@@ -55,12 +60,19 @@ const ClientDocumentsModal = ({ isOpen, onClose, clientId, clientName }: ClientD
         const file = files[i];
         const fileName = `${clientId}/${Date.now()}-admin-${file.name}`;
 
+        console.log('Uploading file:', file.name);
+
         // Upload do arquivo para o storage
         const { error: uploadError } = await supabase.storage
           .from('client-documents')
           .upload(fileName, file);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          throw uploadError;
+        }
+
+        console.log('File uploaded successfully, registering in database...');
 
         // Registrar o documento na tabela
         const { data: documentRecord, error: dbError } = await supabase
@@ -77,13 +89,17 @@ const ClientDocumentsModal = ({ isOpen, onClose, clientId, clientName }: ClientD
           .select()
           .single();
 
-        if (dbError) throw dbError;
+        if (dbError) {
+          console.error('Database error:', dbError);
+          throw dbError;
+        }
+
+        console.log('Document registered in database:', documentRecord);
 
         // Disparar webhook
         await triggerWebhook(documentRecord);
       }
 
-      toast.success(`${files.length} arquivo(s) enviado(s) com sucesso!`);
       setFiles(null);
       setDescription('');
       setRefreshTrigger(prev => prev + 1);
@@ -166,8 +182,8 @@ const ClientDocumentsModal = ({ isOpen, onClose, clientId, clientName }: ClientD
                   {Array.from(files).map((file, index) => (
                     <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
                       <FileText className="w-4 h-4" />
-                      <span>{file.name}</span>
-                      <span className="text-xs">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                      <span className="truncate">{file.name}</span>
+                      <span className="text-xs whitespace-nowrap">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                     </div>
                   ))}
                 </div>

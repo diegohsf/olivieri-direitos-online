@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -62,17 +63,21 @@ const ClientDocuments = () => {
 
   const triggerWebhook = async (documentRecord: any) => {
     try {
+      console.log('Triggering webhook for record:', documentRecord);
       const { error } = await supabase.functions.invoke('document-upload-webhook', {
         body: { record: documentRecord }
       });
       
       if (error) {
         console.error('Webhook error:', error);
+        toast.error('Arquivo enviado, mas houve erro no webhook de notificação');
       } else {
         console.log('Webhook triggered successfully');
+        toast.success('Arquivo enviado e notificação enviada com sucesso!');
       }
     } catch (error) {
       console.error('Error triggering webhook:', error);
+      toast.error('Arquivo enviado, mas houve erro no webhook de notificação');
     }
   };
 
@@ -91,12 +96,19 @@ const ClientDocuments = () => {
         const file = files[i];
         const fileName = `${clientId}/${Date.now()}-${isAdmin ? 'admin' : 'client'}-${file.name}`;
 
+        console.log('Uploading file:', file.name);
+
         // Upload do arquivo para o storage
         const { error: uploadError } = await supabase.storage
           .from('client-documents')
           .upload(fileName, file);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          throw uploadError;
+        }
+
+        console.log('File uploaded successfully, registering in database...');
 
         // Registrar o documento na tabela
         const { data: documentRecord, error: dbError } = await supabase
@@ -113,13 +125,17 @@ const ClientDocuments = () => {
           .select()
           .single();
 
-        if (dbError) throw dbError;
+        if (dbError) {
+          console.error('Database error:', dbError);
+          throw dbError;
+        }
+
+        console.log('Document registered in database:', documentRecord);
 
         // Disparar webhook
         await triggerWebhook(documentRecord);
       }
 
-      toast.success(`${files.length} arquivo(s) enviado(s) com sucesso!`);
       setFiles(null);
       setDescription('');
       setRefreshTrigger(prev => prev + 1);
@@ -152,7 +168,7 @@ const ClientDocuments = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b px-6 py-4">
+      <div className="bg-white border-b px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
@@ -164,16 +180,16 @@ const ClientDocuments = () => {
               Voltar
             </Button>
             <div>
-              <h1 className="text-2xl font-semibold text-gray-800">
+              <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
                 Documentos de {clientInfo.name}
               </h1>
-              <p className="text-gray-600">{clientInfo.email}</p>
+              <p className="text-gray-600 text-sm sm:text-base">{clientInfo.email}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <Tabs defaultValue="view" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="view">Visualizar Documentos</TabsTrigger>
@@ -232,8 +248,8 @@ const ClientDocuments = () => {
                     {Array.from(files).map((file, index) => (
                       <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
                         <FileText className="w-4 h-4" />
-                        <span>{file.name}</span>
-                        <span className="text-xs">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                        <span className="truncate">{file.name}</span>
+                        <span className="text-xs whitespace-nowrap">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                       </div>
                     ))}
                   </div>
