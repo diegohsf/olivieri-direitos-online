@@ -21,7 +21,7 @@ const Login = () => {
 
     try {
       // Credenciais de administrador
-      if (email === 'admin@luisolivieri.com.br' && password === 'admin123') {
+      if (email === 'admin@luisolivieri.com.br' && password === '@Luis131179') {
         localStorage.setItem('adminAuth', 'true');
         toast.success('Login administrativo realizado com sucesso!');
         navigate('/admin');
