@@ -114,7 +114,7 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
 
   const setupRealtimeSubscription = (convId: string) => {
     const channel = supabase
-      .channel('chat_messages')
+      .channel(`chat_messages_${convId}`)
       .on(
         'postgres_changes',
         {
@@ -124,6 +124,7 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
           filter: `conversation_id=eq.${convId}`
         },
         (payload) => {
+          console.log('Nova mensagem recebida via realtime:', payload);
           const newMsg = payload.new as any;
           setMessages(prev => [...prev, {
             id: newMsg.id,
@@ -161,6 +162,19 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
         message_text: newMessage.trim()
       });
 
+      // Adicionar mensagem otimisticamente na interface
+      const tempMessage = {
+        id: `temp-${Date.now()}`,
+        message_text: newMessage.trim(),
+        sender_type: isAdmin ? 'admin' as const : 'client' as const,
+        sender_id: currentUserId,
+        created_at: new Date().toISOString(),
+        read_at: null
+      };
+
+      setMessages(prev => [...prev, tempMessage]);
+      setNewMessage('');
+
       const { error } = await supabase
         .from('chat_messages')
         .insert([{
@@ -172,10 +186,11 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
 
       if (error) {
         console.error('Erro detalhado ao enviar mensagem:', error);
+        // Remover mensagem temporária em caso de erro
+        setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id));
         throw error;
       }
 
-      setNewMessage('');
       console.log('Mensagem enviada com sucesso');
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);
