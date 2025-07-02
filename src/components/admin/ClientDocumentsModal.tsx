@@ -26,6 +26,22 @@ const ClientDocumentsModal = ({ isOpen, onClose, clientId, clientName }: ClientD
     setFiles(e.target.files);
   };
 
+  const triggerWebhook = async (documentRecord: any) => {
+    try {
+      const { error } = await supabase.functions.invoke('document-upload-webhook', {
+        body: { record: documentRecord }
+      });
+      
+      if (error) {
+        console.error('Webhook error:', error);
+      } else {
+        console.log('Webhook triggered successfully');
+      }
+    } catch (error) {
+      console.error('Error triggering webhook:', error);
+    }
+  };
+
   const handleUpload = async () => {
     if (!files || files.length === 0) {
       toast.error('Selecione pelo menos um arquivo');
@@ -47,7 +63,7 @@ const ClientDocumentsModal = ({ isOpen, onClose, clientId, clientName }: ClientD
         if (uploadError) throw uploadError;
 
         // Registrar o documento na tabela
-        const { error: dbError } = await supabase
+        const { data: documentRecord, error: dbError } = await supabase
           .from('client_documents')
           .insert({
             client_id: clientId,
@@ -57,9 +73,14 @@ const ClientDocumentsModal = ({ isOpen, onClose, clientId, clientName }: ClientD
             file_type: file.type || 'application/octet-stream',
             description: description || null,
             uploaded_by_admin: true
-          });
+          })
+          .select()
+          .single();
 
         if (dbError) throw dbError;
+
+        // Disparar webhook
+        await triggerWebhook(documentRecord);
       }
 
       toast.success(`${files.length} arquivo(s) enviado(s) com sucesso!`);
