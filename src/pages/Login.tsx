@@ -56,7 +56,7 @@ const Login = () => {
 
   const handleWhatsAppContact = () => {
     // Número do WhatsApp do escritório - ajuste conforme necessário
-    const whatsappNumber = "5511999999999"; // Substitua pelo número real
+    const whatsappNumber = "5511947928925"; // Substitua pelo número real
     const message = "Olá! Estou com problemas para acessar a área restrita do site.";
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
