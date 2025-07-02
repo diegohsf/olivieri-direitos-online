@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Lock, Mail, Eye, EyeOff } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
@@ -52,6 +52,14 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleWhatsAppContact = () => {
+    // Número do WhatsApp do escritório - ajuste conforme necessário
+    const whatsappNumber = "5511999999999"; // Substitua pelo número real
+    const message = "Olá! Estou com problemas para acessar a área restrita do site.";
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   return (
@@ -117,11 +125,14 @@ const Login = () => {
           </form>
           
           <div className="pt-6 border-t border-gray-200">
-            <div className="text-sm text-gray-600 space-y-1">
-              <p><strong>Acesso de Demonstração:</strong></p>
-              <p><strong>Admin:</strong> admin@luisolivieri.com.br / admin123</p>
-              <p><strong>Cliente:</strong> Use as credenciais fornecidas pelo administrador</p>
-            </div>
+            <Button
+              onClick={handleWhatsAppContact}
+              variant="outline"
+              className="w-full h-12 border-green-500 text-green-600 hover:bg-green-50 font-medium"
+            >
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Precisa de ajuda? Entre em contato via WhatsApp
+            </Button>
           </div>
         </CardContent>
       </Card>
