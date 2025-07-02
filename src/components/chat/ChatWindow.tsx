@@ -125,13 +125,17 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
   const setupRealtimeSubscription = (convId: string) => {
     // Remove canal anterior se existir
     if (channelRef.current) {
+      console.log('Removendo canal anterior');
       supabase.removeChannel(channelRef.current);
     }
 
     console.log('Configurando real-time para conversa:', convId);
     
+    // Usar um nome de canal único baseado no timestamp para evitar conflitos
+    const channelName = `messages_${convId}_${Date.now()}`;
+    
     const channel = supabase
-      .channel(`chat_${convId}`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -144,16 +148,18 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
           console.log('Nova mensagem recebida via realtime:', payload);
           const newMsg = payload.new as any;
           
-          // Verificar se a mensagem já existe para evitar duplicatas
+          // Adicionar mensagem imediatamente sem verificar duplicatas
+          // pois o real-time deve ser a fonte única de verdade para novas mensagens
           setMessages(prev => {
-            const exists = prev.some(msg => msg.id === newMsg.id);
+            // Só adicionar se realmente não existir
+            const exists = prev.find(msg => msg.id === newMsg.id);
             if (exists) {
-              console.log('Mensagem já existe, ignorando duplicata');
+              console.log('Mensagem já existe, ignorando');
               return prev;
             }
             
-            console.log('Adicionando nova mensagem ao estado');
-            return [...prev, {
+            console.log('Adicionando nova mensagem do real-time');
+            const updatedMessages = [...prev, {
               id: newMsg.id,
               message_text: newMsg.message_text,
               sender_type: newMsg.sender_type as 'client' | 'admin',
@@ -161,13 +167,22 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
               created_at: newMsg.created_at,
               read_at: newMsg.read_at
             }];
+            
+            return updatedMessages;
           });
         }
       )
       .subscribe((status) => {
         console.log('Status da subscrição real-time:', status);
         if (status === 'SUBSCRIBED') {
-          console.log('Real-time ativo para conversa:', convId);
+          console.log('✅Real-time ATIVO para conversa:', convId);
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('❌Erro no canal real-time');
+          // Tentar reconectar após um delay
+          setTimeout(() => {
+            console.log('Tentando reconectar real-time...');
+            setupRealtimeSubscription(convId);
+          }, 2000);
         }
       });
 
@@ -211,7 +226,7 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
         throw error;
       }
 
-      console.log('Mensagem enviada com sucesso');
+      console.log('✅Mensagem enviada com sucesso - real-time deve atualizar automaticamente');
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);
       toast.error('Erro ao enviar mensagem');
