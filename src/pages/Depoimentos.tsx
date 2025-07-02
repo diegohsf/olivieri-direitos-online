@@ -131,7 +131,7 @@ const Depoimentos = () => {
       {/* Stats Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {stats.map((stat, index) => (
               <Card key={index} className="text-center p-6 border-amber-200 hover:shadow-lg transition-shadow">
                 <CardContent className="p-0">
@@ -200,7 +200,7 @@ const Depoimentos = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             <div className="text-center">
               <div className="w-20 h-20 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-10 h-10 text-slate-800" />
@@ -255,7 +255,7 @@ const Depoimentos = () => {
       {/* Footer */}
       <footer className="bg-slate-800 text-white py-12">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <img src="/lovable-uploads/cdd2862a-e90c-4d36-b585-2687f9cfcee1.png" alt="Luis Olivieri Logo" className="h-8 w-auto" />

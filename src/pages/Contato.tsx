@@ -149,7 +149,7 @@ const Contato = () => {
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-800 mb-2">Nome Completo</label>
                         <Input
@@ -288,7 +288,7 @@ const Contato = () => {
             <p className="text-lg text-gray-600">Estamos disponíveis nos seguintes horários para melhor atendê-lo</p>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
             <Card className="border-amber-200">
               <CardHeader>
                 <CardTitle className="text-xl text-slate-800 flex items-center">
@@ -328,7 +328,7 @@ const Contato = () => {
       {/* Footer */}
       <footer className="bg-slate-800 text-white py-12">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <img src="/lovable-uploads/cdd2862a-e90c-4d36-b585-2687f9cfcee1.png" alt="Luis Olivieri Logo" className="h-8 w-auto" />

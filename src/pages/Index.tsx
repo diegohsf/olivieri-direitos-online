@@ -117,25 +117,27 @@ const Index = () => {
     <div className="min-h-screen bg-white">
       {/* Top Bar */}
       <div className="bg-slate-800 text-white py-2">
-        <div className="container mx-auto px-4 flex items-center justify-between text-sm">
-          <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-2">
-              <Phone className="w-4 h-4" />
-              <span>(11) 3380-6725</span>
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between text-sm gap-2">
+            <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-6">
+              <div className="flex items-center space-x-2">
+                <Phone className="w-4 h-4" />
+                <span>(11) 3380-6725</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Phone className="w-4 h-4" />
+                <span>(11) 94792-8925</span>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Phone className="w-4 h-4" />
-              <span>(11) 94792-8925</span>
+            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+              <span className="text-center sm:text-left">Atuamos em todo Território Nacional de Forma 100% Digital</span>
+              <Button 
+                size="sm" 
+                className="bg-yellow-500 text-slate-800 hover:bg-yellow-600 font-medium"
+              >
+                <a href="/login">🔐 Área do Cliente</a>
+              </Button>
             </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <span>Atuamos em todo Território Nacional de Forma 100% Digital</span>
-            <Button 
-              size="sm" 
-              className="bg-yellow-500 text-slate-800 hover:bg-yellow-600 font-medium"
-            >
-              <a href="/cliente-login">🔐 Área do Cliente</a>
-            </Button>
           </div>
         </div>
       </div>
@@ -144,18 +146,27 @@ const Index = () => {
       <header className="bg-white text-slate-800 shadow-lg sticky top-0 z-50 border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <img 
                 src="/lovable-uploads/cdd2862a-e90c-4d36-b585-2687f9cfcee1.png" 
-                alt="Logo" 
-                className="h-12 w-auto"
+                alt="Luis Augusto Olivieri Logo" 
+                className="h-8 sm:h-12 w-auto"
               />
               <div>
-                <h1 className="text-2xl font-bold text-slate-800">Luis Augusto Olivieri</h1>
-                <p className="text-sm text-gray-600">Sociedade de Advogados</p>
+                <h1 className="text-lg sm:text-2xl font-bold text-slate-800">Luis Augusto Olivieri</h1>
+                <p className="text-xs sm:text-sm text-gray-600">Sociedade de Advogados</p>
               </div>
             </div>
-            <nav className="hidden md:flex items-center space-x-8">
+            
+            {/* Mobile menu button */}
+            <button className="md:hidden p-2">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
               <a href="/" className="hover:text-yellow-500 transition-colors font-medium border-b-2 border-slate-800">Início</a>
               <a href="/sobre" className="hover:text-yellow-500 transition-colors">Sobre</a>
               <a href="/especialidades" className="hover:text-yellow-500 transition-colors">Especialidades</a>
@@ -165,7 +176,7 @@ const Index = () => {
                 size="sm" 
                 className="bg-slate-800 text-white hover:bg-slate-700 font-medium"
               >
-                <a href="/cliente-login">👤 Área do Cliente</a>
+                <a href="/login">👤 Área do Cliente</a>
               </Button>
             </nav>
           </div>
@@ -173,33 +184,33 @@ const Index = () => {
       </header>
 
       {/* Hero Section */}
-      <section id="inicio" className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800 text-white py-20">
+      <section id="inicio" className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800 text-white py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="text-center lg:text-left">
               <Badge className="bg-yellow-500 text-slate-800 mb-4 font-medium">OAB/SP 252.648</Badge>
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
                 Seus Direitos<br />
                 <span className="text-yellow-400">Previdenciários</span>
               </h1>
-              <p className="text-xl mb-8 text-gray-300">
+              <p className="text-lg sm:text-xl mb-8 text-gray-300">
                 Especialista em Direito Previdenciário e Trabalhista com mais de 15 anos de experiência. Atuamos em todo território nacional de forma 100% digital.
               </p>
-              <div className="flex flex-wrap gap-8 mb-8">
+              <div className="grid grid-cols-3 gap-4 sm:gap-8 mb-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-yellow-400">800+</div>
-                  <div className="text-sm text-gray-300">Benefícios Conquistados</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-yellow-400">800+</div>
+                  <div className="text-xs sm:text-sm text-gray-300">Benefícios Conquistados</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-yellow-400">15+</div>
-                  <div className="text-sm text-gray-300">Anos de Experiência</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-yellow-400">15+</div>
+                  <div className="text-xs sm:text-sm text-gray-300">Anos de Experiência</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-yellow-400">100%</div>
-                  <div className="text-sm text-gray-300">Atendimento Digital</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-yellow-400">100%</div>
+                  <div className="text-xs sm:text-sm text-gray-300">Atendimento Digital</div>
                 </div>
               </div>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 font-medium">
                   <a href="#contato">Fale Conosco</a>
                 </Button>
@@ -208,12 +219,12 @@ const Index = () => {
                 </Button>
               </div>
             </div>
-            <div className="bg-slate-700/50 backdrop-blur-sm rounded-lg p-6 border border-slate-600">
-              <div className="flex items-center mb-4">
+            <div className="bg-slate-700/50 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-slate-600 mt-8 lg:mt-0">
+              <div className="flex items-center justify-center mb-4">
                 <MessageCircle className="w-6 h-6 text-yellow-400 mr-2" />
-                <h3 className="text-xl font-semibold text-center">Entre em Contato</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-center">Entre em Contato</h3>
               </div>
-              <p className="text-gray-300 text-center mb-6">Descreva seu caso previdenciário ou trabalhista</p>
+              <p className="text-gray-300 text-center mb-6 text-sm sm:text-base">Descreva seu caso previdenciário ou trabalhista</p>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <Input
                   name="name"
@@ -271,13 +282,13 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="bg-slate-800 text-white p-8 rounded-lg">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="bg-slate-800 text-white p-6 sm:p-8 rounded-lg">
               <div className="text-center mb-6">
-                <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-300 rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden">
                   <img src="/lovable-uploads/f7c000e0-5104-4e8a-bdf4-0c193e78c323.png" alt="Dr. Luis Augusto Olivieri" className="w-full h-full object-cover" />
                 </div>
-                <h3 className="text-xl font-semibold">Dr. Luis Augusto Olivieri</h3>
+                <h3 className="text-lg sm:text-xl font-semibold">Dr. Luis Augusto Olivieri</h3>
                 <p className="text-yellow-400">OAB/SP 252.648</p>
               </div>
               <div className="space-y-4">
@@ -303,17 +314,17 @@ const Index = () => {
                 Dr. Luis Augusto Olivieri dedica sua carreira à defesa incansável dos direitos 
                 de trabalhadores e segurados do INSS.
               </p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <Card className="border-yellow-200">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-yellow-600">95%</div>
-                    <div className="text-sm text-gray-600">Taxa de Sucesso</div>
+                  <CardContent className="p-3 sm:p-4 text-center">
+                    <div className="text-xl sm:text-2xl font-bold text-yellow-600">95%</div>
+                    <div className="text-xs sm:text-sm text-gray-600">Taxa de Sucesso</div>
                   </CardContent>
                 </Card>
                 <Card className="border-yellow-200">
-                  <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-yellow-600">24h</div>
-                    <div className="text-sm text-gray-600">Resposta Máxima</div>
+                  <CardContent className="p-3 sm:p-4 text-center">
+                    <div className="text-xl sm:text-2xl font-bold text-yellow-600">24h</div>
+                    <div className="text-xs sm:text-sm text-gray-600">Resposta Máxima</div>
                   </CardContent>
                 </Card>
               </div>
@@ -332,7 +343,7 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {specialties.map((specialty, index) => (
               <Card key={index} className="hover:shadow-lg transition-shadow border-yellow-200 hover:border-yellow-400">
                 <CardHeader>
@@ -375,7 +386,7 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12">
             {testimonials.map((testimonial, index) => (
               <Card key={index} className="hover:shadow-lg transition-shadow border-yellow-200">
                 <CardHeader>
@@ -396,7 +407,7 @@ const Index = () => {
             ))}
           </div>
 
-          <div className="text-center grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+          <div className="text-center grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto">
             <div>
               <div className="text-3xl font-bold text-yellow-600">95%</div>
               <div className="text-gray-600">Taxa de Sucesso</div>
@@ -423,7 +434,7 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-12">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
             <div className="space-y-6">
               <h3 className="text-2xl font-semibold mb-6 text-slate-800">Informações de Contato</h3>
               
@@ -526,7 +537,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="bg-slate-800 text-white py-12">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <img src="/lovable-uploads/cdd2862a-e90c-4d36-b585-2687f9cfcee1.png" alt="Luis Olivieri Logo" className="h-8 w-auto" />
