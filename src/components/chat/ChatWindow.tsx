@@ -30,6 +30,7 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const channelRef = useRef<any>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -41,6 +42,14 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
 
   useEffect(() => {
     initializeConversation();
+    
+    // Cleanup on unmount
+    return () => {
+      if (channelRef.current) {
+        console.log('Removendo canal real-time');
+        supabase.removeChannel(channelRef.current);
+      }
+    };
   }, [clientId]);
 
   // Validar se é um UUID válido
@@ -99,6 +108,7 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
 
       if (error) throw error;
 
+      console.log('Mensagens carregadas:', data?.length || 0);
       setMessages(data.map(msg => ({
         id: msg.id,
         message_text: msg.message_text,
@@ -113,8 +123,15 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
   };
 
   const setupRealtimeSubscription = (convId: string) => {
+    // Remove canal anterior se existir
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+    }
+
+    console.log('Configurando real-time para conversa:', convId);
+    
     const channel = supabase
-      .channel(`chat_messages_${convId}`)
+      .channel(`chat_${convId}`)
       .on(
         'postgres_changes',
         {
@@ -126,21 +143,35 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
         (payload) => {
           console.log('Nova mensagem recebida via realtime:', payload);
           const newMsg = payload.new as any;
-          setMessages(prev => [...prev, {
-            id: newMsg.id,
-            message_text: newMsg.message_text,
-            sender_type: newMsg.sender_type as 'client' | 'admin',
-            sender_id: newMsg.sender_id,
-            created_at: newMsg.created_at,
-            read_at: newMsg.read_at
-          }]);
+          
+          // Verificar se a mensagem já existe para evitar duplicatas
+          setMessages(prev => {
+            const exists = prev.some(msg => msg.id === newMsg.id);
+            if (exists) {
+              console.log('Mensagem já existe, ignorando duplicata');
+              return prev;
+            }
+            
+            console.log('Adicionando nova mensagem ao estado');
+            return [...prev, {
+              id: newMsg.id,
+              message_text: newMsg.message_text,
+              sender_type: newMsg.sender_type as 'client' | 'admin',
+              sender_id: newMsg.sender_id,
+              created_at: newMsg.created_at,
+              read_at: newMsg.read_at
+            }];
+          });
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Status da subscrição real-time:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('Real-time ativo para conversa:', convId);
+        }
+      });
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    channelRef.current = channel;
   };
 
   const sendMessage = async () => {
@@ -154,26 +185,16 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
     }
 
     setLoading(true);
+    const messageText = newMessage.trim();
+    setNewMessage(''); // Limpar input imediatamente
+    
     try {
       console.log('Enviando mensagem:', {
         conversation_id: conversationId,
         sender_type: isAdmin ? 'admin' : 'client',
         sender_id: currentUserId,
-        message_text: newMessage.trim()
+        message_text: messageText
       });
-
-      // Adicionar mensagem otimisticamente na interface
-      const tempMessage = {
-        id: `temp-${Date.now()}`,
-        message_text: newMessage.trim(),
-        sender_type: isAdmin ? 'admin' as const : 'client' as const,
-        sender_id: currentUserId,
-        created_at: new Date().toISOString(),
-        read_at: null
-      };
-
-      setMessages(prev => [...prev, tempMessage]);
-      setNewMessage('');
 
       const { error } = await supabase
         .from('chat_messages')
@@ -181,13 +202,12 @@ const ChatWindow = ({ clientId, clientName, isAdmin = false, currentUserId }: Ch
           conversation_id: conversationId,
           sender_type: isAdmin ? 'admin' : 'client',
           sender_id: currentUserId,
-          message_text: newMessage.trim()
+          message_text: messageText
         }]);
 
       if (error) {
         console.error('Erro detalhado ao enviar mensagem:', error);
-        // Remover mensagem temporária em caso de erro
-        setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id));
+        setNewMessage(messageText); // Restaurar mensagem em caso de erro
         throw error;
       }
 
