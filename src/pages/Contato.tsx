@@ -62,7 +62,7 @@ const Contato = () => {
 
   const handleWhatsAppClick = () => {
     const whatsappNumber = "5511947928925";
-    const message = "Olá! Gostaria de uma consultoria jurídica gratuita.";
+    const message = "Olá! Vim do site e preciso tirar algumas duvidas.";
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     console.log('WhatsApp URL:', whatsappUrl); // Para debug
     window.open(whatsappUrl, '_blank');
@@ -85,7 +85,7 @@ const Contato = () => {
       icon: <Phone className="w-6 h-6" />,
       title: "Telefone Fixo",
       info: "(11) 3380-6725",
-      details: "Atendimento de segunda a sexta\ndas 8h às 18h",
+      details: "Atendimento de segunda a sexta\ndas 8h às 17h",
       color: "text-amber-600"
     },
     {
@@ -98,12 +98,12 @@ const Contato = () => {
   ];
 
   const services = [
-    "Análise gratuita do seu caso",
+    "Análise do seu caso",
     "Orientação jurídica completa",
     "Acompanhamento personalizado",
     "Atendimento 100% digital",
     "Resposta em até 24 horas",
-    "Sem cobrança para consulta inicial"
+    "Consulta inicial com um dos melhores do país"
   ];
 
   return (
@@ -134,12 +134,12 @@ const Contato = () => {
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800 text-white py-20">
         <div className="container mx-auto px-4 text-center">
-          <Badge className="bg-amber-500 text-slate-800 mb-4 font-medium">Consulta Gratuita</Badge>
+          <Badge className="bg-amber-500 text-slate-800 mb-4 font-medium">Agende sua consulta</Badge>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
             Entre em <span className="text-amber-400">Contato</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Estamos prontos para defender seus direitos. Agende uma consulta gratuita e descubra como podemos ajudar você.
+            Estamos prontos para defender seus direitos. Agende uma consulta e descubra como podemos ajudar você.
           </p>
         </div>
       </section>
@@ -157,7 +157,7 @@ const Contato = () => {
                     Fale Conosco
                   </CardTitle>
                   <CardDescription className="text-gray-600">
-                    Preencha o formulário abaixo e entraremos em contato em até 24 horas para uma análise gratuita do seu caso.
+                    Preencha o formulário abaixo e entraremos em contato em até 24 horas para uma análise do seu caso.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -221,7 +221,7 @@ const Contato = () => {
                     </Button>
                     
                     <p className="text-sm text-gray-500 text-center">
-                      Ao enviar, você concorda em receber contato para análise gratuita do seu caso
+                      Ao enviar, você concorda em receber contato para análise do seu caso
                     </p>
                   </form>
                 </CardContent>
@@ -359,13 +359,13 @@ const Contato = () => {
               <CardHeader>
                 <CardTitle className="text-xl text-slate-800 flex items-center">
                   <Clock className="w-6 h-6 mr-2 text-amber-600" />
-                  Atendimento Presencial e Telefônico
+                  Atendimento Presencial (com hora marcada) e WhatsApp
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   <p className="text-gray-700"><strong>Segunda a Sexta:</strong> 8h às 18h</p>
-                  <p className="text-gray-700"><strong>Sábado:</strong> 8h às 12h (sob agendamento)</p>
+                  <p className="text-gray-700"><strong>Sábado:</strong> Fechado</p>
                   <p className="text-gray-700"><strong>Domingo:</strong> Fechado</p>
                 </div>
               </CardContent>
@@ -380,9 +380,9 @@ const Contato = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <p className="text-gray-700"><strong>Segunda a Sexta:</strong> 7h às 20h</p>
-                  <p className="text-gray-700"><strong>Sábado:</strong> 8h às 16h</p>
-                  <p className="text-gray-700"><strong>Domingo:</strong> Emergências</p>
+                  <p className="text-gray-700"><strong>Segunda a Sexta:</strong> 8h às 17h</p>
+                  <p className="text-gray-700"><strong>Sábado:</strong> Fechado</p>
+                  <p className="text-gray-700"><strong>Domingo:</strong> Fechado</p>
                   <p className="text-sm text-green-600 mt-3">Resposta garantida em até 24h</p>
                 </div>
               </CardContent>
