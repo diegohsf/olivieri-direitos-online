@@ -297,7 +297,7 @@ const Contato = () => {
                   <ul className="space-y-3">
                     <li className="flex items-center space-x-3">
                       <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                      <span className="text-gray-300">Análise gratuita do seu caso</span>
+                      <span className="text-gray-300">Análise do seu caso</span>
                     </li>
                     <li className="flex items-center space-x-3">
                       <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0" />
@@ -314,10 +314,6 @@ const Contato = () => {
                     <li className="flex items-center space-x-3">
                       <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0" />
                       <span className="text-gray-300">Resposta em até 24 horas</span>
-                    </li>
-                    <li className="flex items-center space-x-3">
-                      <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                      <span className="text-gray-300">Sem cobrança para consulta inicial</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -359,12 +355,12 @@ const Contato = () => {
               <CardHeader>
                 <CardTitle className="text-xl text-slate-800 flex items-center">
                   <Clock className="w-6 h-6 mr-2 text-amber-600" />
-                  Atendimento Presencial (com hora marcada) e WhatsApp
+                  Atendimento Presencial (com hora marcada)
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <p className="text-gray-700"><strong>Segunda a Sexta:</strong> 8h às 18h</p>
+                  <p className="text-gray-700"><strong>Segunda a Sexta:</strong> 8h às 17h</p>
                   <p className="text-gray-700"><strong>Sábado:</strong> Fechado</p>
                   <p className="text-gray-700"><strong>Domingo:</strong> Fechado</p>
                 </div>
