@@ -60,6 +60,17 @@ const Contato = () => {
     }
   };
 
+  const handleWhatsAppClick = () => {
+    const whatsappNumber = "5511947928925";
+    const message = "Olá! Gostaria de uma consultoria jurídica gratuita.";
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const handlePhoneClick = () => {
+    window.open('tel:+551133806725', '_self');
+  };
+
   const contactInfo = [
     {
       icon: <MapPin className="w-6 h-6" />,
@@ -112,7 +123,7 @@ const Contato = () => {
             <a href="/depoimentos" className="hover:text-amber-400 transition-colors">Depoimentos</a>
             <a href="/contato" className="text-amber-400">Contato</a>
             <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-slate-800 font-medium">
-              Área do Cliente
+              <a href="/login">Área do Cliente</a>
             </Button>
           </nav>
         </div>
@@ -266,11 +277,18 @@ const Contato = () => {
 
               {/* Quick Contact Buttons */}
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white">
+                <Button 
+                  onClick={handleWhatsAppClick}
+                  className="flex-1 bg-green-500 hover:bg-green-600 text-white font-medium"
+                >
                   <MessageCircle className="w-4 h-4 mr-2" />
                   WhatsApp: (11) 94792-8925
                 </Button>
-                <Button variant="outline" className="flex-1 border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white">
+                <Button 
+                  onClick={handlePhoneClick}
+                  variant="outline" 
+                  className="flex-1 border-amber-500 text-amber-600 hover:bg-amber-50 font-medium"
+                >
                   <Phone className="w-4 h-4 mr-2" />
                   Ligar: (11) 3380-6725
                 </Button>
