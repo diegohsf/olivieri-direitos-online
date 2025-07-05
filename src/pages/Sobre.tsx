@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -86,7 +85,7 @@ const Sobre = () => {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 lg:mb-16">
             <Card className="text-center p-6 border-amber-200">
               <CardContent className="p-0">
-                <div className="text-3xl font-bold text-amber-600 mb-2">800+</div>
+                <div className="text-3xl font-bold text-amber-600 mb-2">4000+</div>
                 <div className="text-gray-600">Benefícios Conquistados</div>
               </CardContent>
             </Card>
@@ -104,8 +103,8 @@ const Sobre = () => {
             </Card>
             <Card className="text-center p-6 border-amber-200">
               <CardContent className="p-0">
-                <div className="text-3xl font-bold text-amber-600 mb-2">100%</div>
-                <div className="text-gray-600">Atendimento Digital</div>
+                <div className="text-3xl font-bold text-amber-600 mb-2">15000+</div>
+                <div className="text-gray-600">Clientes Atendidos</div>
               </CardContent>
             </Card>
           </div>
@@ -136,7 +135,7 @@ const Sobre = () => {
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-gray-600">
-                  Mais de 800 casos resolvidos com sucesso, abrangendo aposentadorias, 
+                  Mais de 4000 casos resolvidos com sucesso, abrangendo aposentadorias, 
                   auxílios, pensões e questões trabalhistas complexas.
                 </CardDescription>
               </CardContent>

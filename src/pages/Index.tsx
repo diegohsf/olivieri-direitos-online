@@ -198,7 +198,7 @@ const Index = () => {
               </p>
               <div className="grid grid-cols-3 gap-4 sm:gap-8 mb-8">
                 <div className="text-center">
-                  <div className="text-2xl sm:text-3xl font-bold text-yellow-400">800+</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-yellow-400">4000+</div>
                   <div className="text-xs sm:text-sm text-gray-300">Benefícios Conquistados</div>
                 </div>
                 <div className="text-center">
@@ -298,7 +298,7 @@ const Index = () => {
                 </div>
                 <div className="flex items-center space-x-3">
                   <Users className="w-5 h-5 text-yellow-400" />
-                  <span>Mais de 800 casos resolvidos</span>
+                  <span>Mais de 4000 casos resolvidos</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Clock className="w-5 h-5 text-yellow-400" />
@@ -413,11 +413,11 @@ const Index = () => {
               <div className="text-gray-600">Taxa de Sucesso</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-yellow-600">800+</div>
+              <div className="text-3xl font-bold text-yellow-600">4000+</div>
               <div className="text-gray-600">Casos Resolvidos</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-yellow-600">1500+</div>
+              <div className="text-3xl font-bold text-yellow-600">15000+</div>
               <div className="text-gray-600">Clientes Atendidos</div>
             </div>
           </div>
