@@ -64,10 +64,12 @@ const Contato = () => {
     const whatsappNumber = "5511947928925";
     const message = "Olá! Gostaria de uma consultoria jurídica gratuita.";
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    console.log('WhatsApp URL:', whatsappUrl); // Para debug
     window.open(whatsappUrl, '_blank');
   };
 
   const handlePhoneClick = () => {
+    console.log('Phone click'); // Para debug
     window.open('tel:+551133806725', '_self');
   };
 
@@ -237,22 +239,50 @@ const Contato = () => {
               </div>
 
               <div className="space-y-6">
-                {contactInfo.map((contact, index) => (
-                  <Card key={index} className="border-amber-200 hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-start space-x-4">
-                        <div className={`w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center ${contact.color}`}>
-                          {contact.icon}
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-slate-800 mb-1">{contact.title}</h3>
-                          <p className="text-xl text-slate-700 font-medium mb-1">{contact.info}</p>
-                          <p className="text-sm text-gray-600 whitespace-pre-line">{contact.details}</p>
-                        </div>
+                <Card className="border-amber-200 hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600">
+                        <MapPin className="w-6 h-6" />
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-slate-800 mb-1">Endereço</h3>
+                        <p className="text-xl text-slate-700 font-medium mb-1">Av Antártico, 381 – 6º andar – Sala 63</p>
+                        <p className="text-sm text-gray-600 whitespace-pre-line">Jd do Mar – São Bernardo do Campo{'\n'}SP – CEP: 09726-150</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-amber-200 hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600">
+                        <Phone className="w-6 h-6" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-slate-800 mb-1">Telefone Fixo</h3>
+                        <p className="text-xl text-slate-700 font-medium mb-1">(11) 3380-6725</p>
+                        <p className="text-sm text-gray-600 whitespace-pre-line">Atendimento de segunda a sexta{'\n'}das 8h às 18h</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-green-200 hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-green-600">
+                        <MessageCircle className="w-6 h-6" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-slate-800 mb-1">WhatsApp</h3>
+                        <p className="text-xl text-slate-700 font-medium mb-1">(11) 94792-8925</p>
+                        <p className="text-sm text-gray-600 whitespace-pre-line">Atendimento rápido e direto{'\n'}24 horas para resposta</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Services Included */}
@@ -265,12 +295,30 @@ const Contato = () => {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-3">
-                    {services.map((service, index) => (
-                      <li key={index} className="flex items-center space-x-3">
-                        <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                        <span className="text-gray-300">{service}</span>
-                      </li>
-                    ))}
+                    <li className="flex items-center space-x-3">
+                      <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                      <span className="text-gray-300">Análise gratuita do seu caso</span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                      <span className="text-gray-300">Orientação jurídica completa</span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                      <span className="text-gray-300">Acompanhamento personalizado</span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                      <span className="text-gray-300">Atendimento 100% digital</span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                      <span className="text-gray-300">Resposta em até 24 horas</span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                      <span className="text-gray-300">Sem cobrança para consulta inicial</span>
+                    </li>
                   </ul>
                 </CardContent>
               </Card>
@@ -279,7 +327,7 @@ const Contato = () => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
                   onClick={handleWhatsAppClick}
-                  className="flex-1 bg-green-500 hover:bg-green-600 text-white font-medium"
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium"
                 >
                   <MessageCircle className="w-4 h-4 mr-2" />
                   WhatsApp: (11) 94792-8925
