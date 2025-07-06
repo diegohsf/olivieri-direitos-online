@@ -59,6 +59,14 @@ const Index = () => {
     }
   };
 
+  const handleWhatsAppClick = () => {
+    const whatsappNumber = "5511947928925";
+    const message = "Olá! Vim do site e preciso tirar algumas dúvidas sobre meus direitos previdenciários.";
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    console.log('WhatsApp URL:', whatsappUrl);
+    window.open(whatsappUrl, '_blank');
+  };
+
   const specialties = [
     {
       icon: <Shield className="w-8 h-8" />,
@@ -214,7 +222,13 @@ const Index = () => {
                 <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-slate-800 font-medium">
                   <a href="#contato">Fale Conosco</a>
                 </Button>
-                <Button size="lg" variant="outline" className="border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-slate-800">
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-slate-800"
+                  onClick={handleWhatsAppClick}
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
                   WhatsApp
                 </Button>
               </div>
@@ -473,7 +487,10 @@ const Index = () => {
                 <p className="text-gray-300 mb-4">
                   Realizamos consultas e acompanhamento de processos de forma totalmente digital, proporcionando comodidade e agilidade.
                 </p>
-                <Button className="bg-green-600 hover:bg-green-700">
+                <Button 
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={handleWhatsAppClick}
+                >
                   <MessageCircle className="w-4 h-4 mr-2" />
                   WhatsApp
                 </Button>
